@@ -17,13 +17,21 @@ venv\Scripts\activate
 source venv/bin/activate
 ```
 
-## Install Flask & Supabase
+## Install Flask & Supabase & TailwindCSS
 this step has to be done only once for downloading and setting up the necessary dependencies
 ```
 pip install Flask
 ```
 ```
 pip install supabase
+```
+```
+npm install tailwindcss @tailwindcss/cli
+```
+
+### Start Tailwind CLI build process
+```
+npx @tailwindcss/cli -i ./app/static/css/input.css -o ./app/static/css/output.css --watch
 ```
 
 

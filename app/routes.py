@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request
 from .supabase_client import supabase
+from .db import verify_user, register_user
 
 main = Blueprint('main', __name__)
 
@@ -12,8 +13,8 @@ def login():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
-        # TODO: Add login logic (check user in DB)
-        return f"Login attempted for {email}"
+        return str(verify_user(email, password))
+
     return render_template('login.html')
 
 @main.route('/register', methods=['GET', 'POST'])
@@ -22,13 +23,9 @@ def register():
         username = request.form['username']
         email = request.form['email']
         password = request.form['password']
-        # TODO: Add registration logic (save user in DB)
+
         # Insert into Supabase
-        response = supabase.table('users').insert({
-            "name": username
-            #"email": email,
-            #"password": password  # WARNING: store hashed passwords in production
-        }).execute()
+        register_user(username, email, password)
         return f"Register attempted for {username}"
     return render_template('register.html')
 

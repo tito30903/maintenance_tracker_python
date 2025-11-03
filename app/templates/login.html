@@ -3,13 +3,36 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-<div class="auth-card">
-    <h2>Login</h2>
-    <form method="POST">
-        <input type="email" name="email" placeholder="Email" required>
-        <input type="password" name="password" placeholder="Password" required>
-        <button type="submit">Login</button>
-    </form>
-    <p>Don't have an account? <a href="{{ url_for('main.register') }}">Register</a></p>
+<div class="flex items-center justify-center p-4">
+    <div class="bg-white p-4 rounded-2xl shadow-lg w-full max-w-md">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Login</h2>
+        <form method="POST" class="space-y-5">
+            <input
+                    type="email"
+                    name="email"
+                    placeholder="Email"
+                    required
+                    class="input-field">
+            <input
+                    type="password"
+                    name="password"
+                    placeholder="Password"
+                    required
+                    class="input-field">
+            <button
+                    type="submit"
+                    class="w-full bg-indigo-600 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-indigo-700 transition duration-300"
+            >
+                Login
+            </button>
+        </form>
+        <p class="text-center text-gray-600 mt-6">
+            Don't have an account?
+            <a href="{{ url_for('main.register') }}" class="text-indigo-600 hover:underline font-medium">
+                Register
+            </a>
+        </p>
+    </div>
 </div>
+
 {% endblock %}
