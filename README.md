@@ -30,3 +30,6 @@ note: the correct interpreter has to be selected for the project
 ```
 python run.py
 ```
+
+DB password<br>
+yinwoCxrHFOniZ5W
