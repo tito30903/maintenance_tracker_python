@@ -17,10 +17,13 @@ venv\Scripts\activate
 source venv/bin/activate
 ```
 
-## Install Flask
+## Install Flask & Supabase
 this step has to be done only once for downloading and setting up the necessary dependencies
 ```
 pip install Flask
+```
+```
+pip install supabase
 ```
 
 
