@@ -1,6 +1,9 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, jsonify, redirect, Response
+
+from .constants import LOGIN_URL, REGISTER_URL, DASHBOARD_URL, DEBUG_DUMP_USERS_URL, DEBUG_URL, UNAUTHORIZED
+from .models import UserRoles
 from .supabase_client import supabase
-from .db import verify_user, register_user
+from .db import verify_user, register_user, validate_token
 
 main = Blueprint('main', __name__)
 
@@ -8,16 +11,23 @@ main = Blueprint('main', __name__)
 def index():
     return render_template('index.html')
 
-@main.route('/login', methods=['GET', 'POST'])
+@main.route(LOGIN_URL, methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
-        return str(verify_user(email, password))
+
+        response = verify_user(email, password)
+        if response:
+            token = response
+            return jsonify({"success": True, "token": token})
+        else:
+            return jsonify({"success": False, "message": "Invalid email or password"}), 401
 
     return render_template('login.html')
 
-@main.route('/register', methods=['GET', 'POST'])
+
+@main.route(REGISTER_URL, methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         username = request.form['username']
@@ -25,16 +35,46 @@ def register():
         password = request.form['password']
 
         # Insert into Supabase
-        register_user(username, email, password)
-        return f"Register attempted for {username}"
+        return register_user(username, email, password)
     return render_template('register.html')
+
+@main.route(DASHBOARD_URL, methods=['GET'])
+def dashboard():
+    # TODO change later to correct generic dashboard
+    return render_template('dashboard_manager.html')
+
+@main.route(DASHBOARD_URL + '/data', methods=['GET'])
+def dashboard_data():
+    token = request.headers.get('Token')
+
+    if token is None:
+        return redirect(LOGIN_URL)
+
+    role = validate_token(token)
+
+    if role is None:
+        return Response(status=401)
+
+    # Example data based on role
+    if role == UserRoles.MANAGER:
+        data = {"tasks": ["Approve budgets", "Review reports", "Manage team"]}
+    elif role == UserRoles.TECHNICIAN:
+        data = {"tasks": ["Fix issues", "Update systems", "Report status"]}
+    else:
+        data = {"tasks": []}
+
+    return jsonify({"success": True, "data": data})
+
+@main.route(UNAUTHORIZED, methods=['GET'])
+def unauthorized():
+    return render_template('unauthorized.html', LOGIN_URL=LOGIN_URL, REGISTER_URL=REGISTER_URL)
 
 @main.route('/about')
 def about():
     return "This is a Flask project template!"
 
 
-@main.route('/dumpUsers')
+@main.route(DEBUG_URL + DEBUG_DUMP_USERS_URL, methods=['GET'])
 def dump_users():
     users = supabase.table('users').select("*").execute()
     print(users)

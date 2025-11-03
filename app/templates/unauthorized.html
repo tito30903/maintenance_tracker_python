@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flask App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
+</head>
+<body>
+    <div class="flex flex-col items-center justify-center h-screen text-center">
+        <div>
+            <div class="text-6xl mb-5">🚫</div>
+        </div>
+        <h1 class="text-red-500 text-4xl font-bold mb-5">Unauthorized Access</h1>
+        <p class="text-lg mb-8">You do not have permission to view this page.</p>
+        <div class="flex space-x-4">
+            <a href="{{ LOGIN_URL }}">
+                <button class="btn-primary">Login</button>
+            </a>
+            <a href="{{ REGISTER_URL }}">
+                <button class="btn-secondary">Register</button>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

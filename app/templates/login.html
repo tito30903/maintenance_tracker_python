@@ -1,4 +1,4 @@
-{% extends 'auth_base.html' %}
+{% extends 'auth_layout.html' %}
 
 {% block title %}Login{% endblock %}
 
@@ -6,7 +6,7 @@
 <div class="flex items-center justify-center p-4">
     <div class="bg-white p-4 rounded-2xl shadow-lg w-full max-w-md">
         <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Login</h2>
-        <form method="POST" class="space-y-5">
+        <form id="loginForm" method="POST" class="space-y-5">
             <input
                     type="email"
                     name="email"
@@ -21,7 +21,7 @@
                     class="input-field">
             <button
                     type="submit"
-                    class="w-full bg-indigo-600 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-indigo-700 transition duration-300"
+                    class="btn-primary w-full"
             >
                 Login
             </button>
@@ -34,5 +34,10 @@
         </p>
     </div>
 </div>
+
+<!-- Link JS at the bottom -->
+<script src="{{ url_for('static', filename='js/login.js') }}"></script>
+<script src="{{ url_for('static', filename='js/auth_interceptor.js') }}"></script>
+
 
 {% endblock %}
