@@ -30,6 +30,11 @@ npm install tailwindcss @tailwindcss/cli
 ```
 
 ### Start Tailwind CLI build process
+first run this:
+```
+python run.py
+```
+then
 ```
 npx @tailwindcss/cli -i ./app/static/css/input.css -o ./app/static/css/output.css --watch
 ```
