@@ -10,10 +10,18 @@ nav a {
     color: blue;
 }
 
+.custom-border {
+    @apply text-center p-5 rounded-xl border border-gray-200 bg-white shadow-sm;
+}
+
 .input-field {
     @apply w-full px-4 py-3 rounded-lg border border-gray-300
     focus:outline-none focus:ring-2 focus:ring-indigo-500
     focus:border-indigo-500;
+}
+
+button {
+    @apply cursor-pointer;
 }
 
 /* First styling: Black background with white text and rounded borders */

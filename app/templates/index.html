@@ -1,8 +1,39 @@
-{% extends 'base.html' %}
-
-{% block title %}Home{% endblock %}
-
-{% block content %}
-<h1>Welcome to My Flask App!</h1>
-<p>This is a starter template with folder structure, static files, and templates.</p>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome | Maintenance Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
+</head>
+<body>
+    <div class="w-screen h-screen flex flex-col items-center justify-center">
+        <div class="text-center max-w-2xl">
+            <div class="mb-8 animate-pulse text-6xl">🛠️</div>
+            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
+                Welcome to the <span class="bg-gradient-to-r from-black via-gray-700 to-black bg-clip-text text-transparent">Maintenance Tracker</span>
+            </h1>
+            <p class="text-lg md:text-xl text-gray-600 mb-10 leading-relaxed">
+                Streamline asset upkeep, assign technician tasks, and keep management in the loop — all from one intuitive dashboard.
+            </p>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="{{ LOGIN_URL }}" class="btn-primary w-full sm:w-auto">Login</a>
+                <a href="{{ REGISTER_URL }}" class="btn-secondary w-full sm:w-auto">Register</a>
+            </div>
+            <div class="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-6 text-sm">
+                <div class="custom-border">
+                    <h3 class="font-semibold mb-2">Role-Based Access</h3>
+                    <p class="text-gray-500">Managers and technicians see tailored dashboards for faster decisions.</p>
+                </div>
+                <div class="custom-border">
+                    <h3 class="font-semibold mb-2">Task Oversight</h3>
+                    <p class="text-gray-500">Track maintenance tickets, statuses, and priorities in real time.</p>
+                </div>
+                <div class="custom-border">
+                    <h3 class="font-semibold mb-2">Secure Access</h3>
+                    <p class="text-gray-500">Token-based auth keeps your operational data protected.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

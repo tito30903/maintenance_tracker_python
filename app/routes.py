@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, jsonify, redirect, Response
 
-from .constants import LOGIN_URL, REGISTER_URL, DASHBOARD_URL, DEBUG_DUMP_USERS_URL, DEBUG_URL, UNAUTHORIZED
+from .constants import LOGIN_URL, REGISTER_URL, DASHBOARD_URL, DEBUG_DUMP_USERS_URL, DEBUG_URL, UNAUTHORIZED, \
+    DEBUG_DUMP_TICKETS_URL, API_TICKET
 from .models import UserRoles
 from .supabase_client import supabase
 from .db import verify_user, register_user, validate_token
@@ -65,17 +66,36 @@ def dashboard_data():
 
     return jsonify({"success": True, "data": data})
 
+@main.route(API_TICKET + '/create', methods=['POST'])
+def create_ticket():
+    token = request.headers.get('Token')
+    if token is None:
+        return Response(status=401)
+
+    if validate_token(token) is None:
+        return Response(status=401)
+
+    ticket_name = request.get_json().get('name')
+
+    supabase.table('tickets').insert({'name': ticket_name}).execute()
+    return Response(status=201)
+
 @main.route(UNAUTHORIZED, methods=['GET'])
 def unauthorized():
-    return render_template('unauthorized.html', LOGIN_URL=LOGIN_URL, REGISTER_URL=REGISTER_URL)
+    return render_template('unauthorized.html')
 
 @main.route('/about')
 def about():
     return "This is a Flask project template!"
-
 
 @main.route(DEBUG_URL + DEBUG_DUMP_USERS_URL, methods=['GET'])
 def dump_users():
     users = supabase.table('users').select("*").execute()
     print(users)
     return users.data
+
+@main.route(DEBUG_URL + DEBUG_DUMP_TICKETS_URL, methods=['GET'])
+def dump_tickets():
+    tickets = supabase.table('tickets').select("*").execute()
+    print(tickets)
+    return tickets.data
