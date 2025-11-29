@@ -19,9 +19,11 @@ def login():
         password = request.form['password']
 
         response = verify_user(email, password)
-        if response:
-            token = response
-            return jsonify({"success": True, "token": token})
+
+        print(response)
+
+        if isinstance(response, tuple):
+            return jsonify({"success": True, "token": response[0], "role": response[1].__str__()}), 200
         else:
             return jsonify({"success": False, "message": "Invalid email or password"}), 401
 

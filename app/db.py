@@ -12,13 +12,19 @@ def validate_token(token: str) -> UserRoles | None:
         return UserRoles.getRoleById(role_id)
     return None
 
-def verify_user(email: str, password: str) -> str:
+def verify_user(email: str, password: str) -> tuple[str, UserRoles] | None:
     """
     Check if a user exists and password matches.
-    Returns True if valid, False otherwise.
+    Returns token and role if valid, None otherwise.
     """
     response = supabase.table("users").select("*").eq("email", email).eq("password", password).execute()
-    return response.data[0].get("token")
+
+    if len(response.data) != 1:
+        return None
+
+    found_user = response.data[0]
+
+    return found_user.get("token"), UserRoles.getRoleById(found_user.get("role"))
 
 def register_user(username:str, email: str, password: str) -> str:
     try:

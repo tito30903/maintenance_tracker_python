@@ -13,6 +13,7 @@ loginForm.addEventListener("submit", async (e) => {
 
     if (data.success) {
         localStorage.setItem("token", data.token);
+        localStorage.setItem("role", data.role);
         window.location.href = "/dashboard"; // redirect after login
     } else {
         alert(data.message);
