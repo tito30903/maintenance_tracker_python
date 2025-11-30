@@ -418,7 +418,6 @@ function showTicketSidebar(ticketId) {
     
     // Populate assignee dropdown
     const assigneeMenu = document.getElementById('sidebar-assignee-menu');
-    assigneeMenu.querySelectorAll('button:not([data-assignee=""])').forEach(btn => btn.remove());
     techniciansCache.forEach(tech => {
         const btn = document.createElement('button');
         btn.className = 'w-full text-left px-3 py-1.5 hover:bg-gray-100 text-sm';
