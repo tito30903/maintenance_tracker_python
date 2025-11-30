@@ -454,6 +454,3 @@ function closeSidebar() {
     sidebar.classList.remove('w-80', 'p-4');
     sidebar.classList.add('w-0');
 }
-
-// Make closeSidebar available globally for onclick
-window.closeSidebar = closeSidebar;
