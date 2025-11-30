@@ -1,4 +1,5 @@
 {% extends 'dashboard_layout.html' %}
+{% from 'components/dropdowns.html' import status_menu_items, priority_menu_items, assignee_menu_base, filter_priority_menu_items %}
 
 {% block content %}
 <div class="flex flex-1">
@@ -64,22 +65,7 @@
 
                     </button>
                     <div id="filter-priority-menu" class="absolute left-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[150px] z-50 hidden">
-                        <button class="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 text-sm" data-filter-priority="">
-                            <img src="/static/images/all-priorities.svg" class="w-4 h-4" alt="all priorities" />
-                            All Priorities
-                        </button>
-                        <button class="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 text-sm" data-filter-priority="3">
-                            <img src="/static/images/high-priority.svg" class="w-4 h-4" alt="High Priority" />
-                            High
-                        </button>
-                        <button class="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 text-sm" data-filter-priority="2">
-                            <img src="/static/images/medium-priority.svg" class="w-4 h-4" alt="Medium Priority" />
-                            Medium
-                        </button>
-                        <button class="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 text-sm" data-filter-priority="1">
-                            <img src="/static/images/low-priority.svg" class="w-4 h-4" alt="Low Priority" />
-                            Low
-                        </button>
+                        {{ filter_priority_menu_items() }}
                     </div>
                 </div>
 
@@ -127,15 +113,7 @@
                 <div class="relative mt-1">
                     <button id="sidebar-status" class="text-xs px-2 py-1 rounded-full cursor-pointer hover:opacity-70"></button>
                     <div id="sidebar-status-menu" class="absolute left-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[120px] z-50 hidden">
-                        <button class="w-full text-left px-3 py-1.5 hover:bg-gray-100 text-sm" data-status="1">
-                            <span class="inline-block w-2 h-2 rounded-full bg-yellow-400 mr-2"></span>Open
-                        </button>
-                        <button class="w-full text-left px-3 py-1.5 hover:bg-gray-100 text-sm" data-status="2">
-                            <span class="inline-block w-2 h-2 rounded-full bg-blue-400 mr-2"></span>In Progress
-                        </button>
-                        <button class="w-full text-left px-3 py-1.5 hover:bg-gray-100 text-sm" data-status="3">
-                            <span class="inline-block w-2 h-2 rounded-full bg-green-400 mr-2"></span>Closed
-                        </button>
+                        {{ status_menu_items() }}
                     </div>
                 </div>
             </div>
@@ -146,18 +124,7 @@
                 <div class="relative mt-1">
                     <button id="sidebar-priority" class="flex items-center gap-2 cursor-pointer hover:opacity-70"></button>
                     <div id="sidebar-priority-menu" class="absolute left-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[120px] z-50 hidden">
-                        <button class="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 text-sm" data-priority="3">
-                            <img src="/static/images/high-priority.svg" class="w-4 h-4" alt="High Priority" />
-                            High
-                        </button>
-                        <button class="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 text-sm" data-priority="2">
-                            <img src="/static/images/medium-priority.svg" class="w-4 h-4" alt="Medium Priority" />
-                            Medium
-                        </button>
-                        <button class="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 text-sm" data-priority="1">
-                            <img src="/static/images/low-priority.svg" class="w-4 h-4" alt="Low Priority" />
-                            Low
-                        </button>
+                        {{ priority_menu_items() }}
                     </div>
                 </div>
             </div>
@@ -171,10 +138,7 @@
                         <span id="sidebar-assignee-name">Unassigned</span>
                     </button>
                     <div id="sidebar-assignee-menu" class="absolute left-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[150px] z-50 hidden">
-                        <button class="w-full text-left px-3 py-1.5 hover:bg-gray-100 text-sm text-gray-500" data-assignee="">
-                            Unassigned
-                        </button>
-                        <!-- Technicians will be added here dynamically -->
+                        {{ assignee_menu_base() }}
                     </div>
                 </div>
             </div>
@@ -202,10 +166,7 @@
                     </button>
                     <!-- Assignment dropdown -->
                     <div class="assignee-menu absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[150px] z-50 hidden">
-                        <button class="w-full text-left px-3 py-1.5 hover:bg-gray-100 text-sm text-gray-500" data-assignee="">
-                            Unassigned
-                        </button>
-                        <!-- Technicians will be added here dynamically -->
+                        {{ assignee_menu_base() }}
                     </div>
                 </div>
                 
@@ -214,18 +175,7 @@
                     <button class="ticket-priority cursor-pointer hover:opacity-70 flex items-center justify-center w-6 h-6"></button>
                     <!-- Priority dropdown -->
                     <div class="priority-menu absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[120px] z-50 hidden">
-                        <button class="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 text-sm" data-priority="3">
-                            <img src="/static/images/high-priority.svg" class="w-4 h-4" alt="High Priority" />
-                            High
-                        </button>
-                        <button class="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 text-sm" data-priority="2">
-                            <img src="/static/images/medium-priority.svg" class="w-4 h-4" alt="Medium Priority" />
-                            Medium
-                        </button>
-                        <button class="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 text-sm" data-priority="1">
-                            <img src="/static/images/low-priority.svg" class="w-4 h-4" alt="Low Priority" />
-                            Low
-                        </button>
+                        {{ priority_menu_items() }}
                     </div>
                 </div>
                 <!-- Status -->
@@ -233,15 +183,7 @@
                     <button class="ticket-status text-xs px-2 py-1 rounded-full cursor-pointer hover:opacity-70"></button>
                     <!-- Status dropdown -->
                     <div class="status-menu absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[120px] z-50 hidden">
-                        <button class="w-full text-left px-3 py-1.5 hover:bg-gray-100 text-sm" data-status="1">
-                            <span class="inline-block w-2 h-2 rounded-full bg-yellow-400 mr-2"></span>Open
-                        </button>
-                        <button class="w-full text-left px-3 py-1.5 hover:bg-gray-100 text-sm" data-status="2">
-                            <span class="inline-block w-2 h-2 rounded-full bg-blue-400 mr-2"></span>In Progress
-                        </button>
-                        <button class="w-full text-left px-3 py-1.5 hover:bg-gray-100 text-sm" data-status="3">
-                            <span class="inline-block w-2 h-2 rounded-full bg-green-400 mr-2"></span>Closed
-                        </button>
+                        {{ status_menu_items() }}
                     </div>
                 </div>
             </div>
@@ -249,449 +191,5 @@
     </div>
 </template>
 
-<script>
-    let techniciansCache = [];
-    let ticketsCache = [];
-    let currentSidebarTicketId = null;
-    
-    // Filter state
-    let filters = {
-        technician: '',
-        status: '',
-        priority: ''
-    };
-    
-    document.addEventListener('DOMContentLoaded', init);
-    document.addEventListener('ticketCreated', loadTickets);
-
-    async function init() {
-        techniciansCache = await fetchTechnicians();
-        await loadTickets();
-        setupTicketCardEventDelegation();
-        setupSidebarEvents();
-        setupFilterEvents();
-        populateFilterTechnicians();
-    }
-
-    function setupFilterEvents() {
-        // Toggle filter dropdowns
-        document.getElementById('filter-technician-btn').addEventListener('click', (e) => {
-            e.stopPropagation();
-            toggleMenu(document.getElementById('filter-technician-menu'));
-        });
-        
-        document.getElementById('filter-status-btn').addEventListener('click', (e) => {
-            e.stopPropagation();
-            toggleMenu(document.getElementById('filter-status-menu'));
-        });
-        
-        document.getElementById('filter-priority-btn').addEventListener('click', (e) => {
-            e.stopPropagation();
-            toggleMenu(document.getElementById('filter-priority-menu'));
-        });
-        
-        // Handle filter selections
-        document.getElementById('filter-technician-menu').addEventListener('click', (e) => {
-            const btn = e.target.closest('button');
-            if (btn && btn.dataset.filterTechnician !== undefined) {
-                filters.technician = btn.dataset.filterTechnician;
-                updateFilterUI();
-                applyFilters();
-            }
-        });
-        
-        document.getElementById('filter-status-menu').addEventListener('click', (e) => {
-            const btn = e.target.closest('button');
-            if (btn && btn.dataset.filterStatus !== undefined) {
-                filters.status = btn.dataset.filterStatus;
-                updateFilterUI();
-                applyFilters();
-            }
-        });
-        
-        document.getElementById('filter-priority-menu').addEventListener('click', (e) => {
-            const btn = e.target.closest('button');
-            if (btn && btn.dataset.filterPriority !== undefined) {
-                filters.priority = btn.dataset.filterPriority;
-                updateFilterUI();
-                applyFilters();
-            }
-        });
-        
-        // Clear filters
-        document.getElementById('clear-filters-btn').addEventListener('click', () => {
-            filters = { technician: '', status: '', priority: '' };
-            updateFilterUI();
-            applyFilters();
-        });
-    }
-    
-    function populateFilterTechnicians() {
-        const menu = document.getElementById('filter-technician-menu');
-        
-        techniciansCache.forEach(tech => {
-            const btn = document.createElement('button');
-            btn.className = 'w-full text-left px-3 py-1.5 hover:bg-gray-100 text-sm';
-            btn.dataset.filterTechnician = tech.id;
-            btn.textContent = tech.name;
-            menu.appendChild(btn);
-        });
-    }
-    
-    function updateFilterUI() {
-        // Update technician filter label
-        if (filters.technician === '') {
-            document.getElementById('filter-technician-label').textContent = 'All Technicians';
-        } else if (filters.technician === 'unassigned') {
-            document.getElementById('filter-technician-label').textContent = 'Unassigned';
-        } else {
-            const tech = techniciansCache.find(t => t.id === filters.technician);
-            document.getElementById('filter-technician-label').textContent = tech ? tech.name : 'Unknown';
-        }
-        
-        // Update status filter
-        const statusDot = document.getElementById('filter-status-dot');
-        const statusLabel = document.getElementById('filter-status-label');
-        if (filters.status === '') {
-            statusDot.className = 'w-2 h-2 rounded-full bg-gray-400';
-            statusLabel.textContent = 'All Statuses';
-        } else {
-            const statusColors = { '1': 'bg-yellow-400', '2': 'bg-blue-400', '3': 'bg-green-400' };
-            statusDot.className = 'w-2 h-2 rounded-full ' + (statusColors[filters.status] || 'bg-gray-400');
-            statusLabel.textContent = getStatusText(parseInt(filters.status));
-        }
-        
-        // Update priority filter
-        const priorityIcon = document.getElementById('filter-priority-icon');
-        const priorityLabel = document.getElementById('filter-priority-label');
-        if (filters.priority === '') {
-            priorityIcon.innerHTML = '<svg class="w-4 h-4" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 10h16"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 14h16"></path></svg>';
-            priorityIcon.className = 'w-4 h-4 text-gray-400';
-            priorityLabel.textContent = 'All Priorities';
-        } else {
-            priorityIcon.innerHTML = getPriorityIcon(parseInt(filters.priority));
-            priorityIcon.className = 'w-4 h-4';
-            priorityLabel.textContent = getPriorityText(parseInt(filters.priority));
-        }
-        
-        // Show/hide clear button
-        const hasFilters = filters.technician || filters.status || filters.priority;
-        document.getElementById('clear-filters-btn').classList.toggle('hidden', !hasFilters);
-    }
-    
-    function applyFilters() {
-        let filtered = [...ticketsCache];
-        
-        // Filter by technician
-        if (filters.technician === 'unassigned') {
-            filtered = filtered.filter(t => !t.assigned_to);
-        } else if (filters.technician) {
-            filtered = filtered.filter(t => t.assigned_to === filters.technician);
-        }
-        
-        // Filter by status
-        if (filters.status) {
-            filtered = filtered.filter(t => t.status === parseInt(filters.status));
-        }
-        
-        // Filter by priority
-        if (filters.priority) {
-            filtered = filtered.filter(t => t.priority === parseInt(filters.priority));
-        }
-        
-        renderTickets(filtered);
-    }
-
-    function setupSidebarEvents() {
-        // Toggle dropdowns
-        document.getElementById('sidebar-status').addEventListener('click', (e) => {
-            e.stopPropagation();
-            toggleMenu(document.getElementById('sidebar-status-menu'));
-        });
-        
-        document.getElementById('sidebar-priority').addEventListener('click', (e) => {
-            e.stopPropagation();
-            toggleMenu(document.getElementById('sidebar-priority-menu'));
-        });
-        
-        document.getElementById('sidebar-assignee').addEventListener('click', (e) => {
-            e.stopPropagation();
-            toggleMenu(document.getElementById('sidebar-assignee-menu'));
-        });
-        
-        // Handle dropdown selections
-        document.getElementById('sidebar-status-menu').addEventListener('click', (e) => {
-            const btn = e.target.closest('button');
-            if (btn && btn.dataset.status && currentSidebarTicketId) {
-                updateTicket({ id: currentSidebarTicketId, status: parseInt(btn.dataset.status) });
-            }
-        });
-        
-        document.getElementById('sidebar-priority-menu').addEventListener('click', (e) => {
-            const btn = e.target.closest('button');
-            if (btn && btn.dataset.priority && currentSidebarTicketId) {
-                updateTicket({ id: currentSidebarTicketId, priority: parseInt(btn.dataset.priority) });
-            }
-        });
-        
-        document.getElementById('sidebar-assignee-menu').addEventListener('click', (e) => {
-            const btn = e.target.closest('button');
-            if (btn && btn.dataset.assignee !== undefined && currentSidebarTicketId) {
-                updateTicket({ id: currentSidebarTicketId, assigned_to: btn.dataset.assignee || null });
-            }
-        });
-
-        // Handle name/description changes on blur -> element lost focus
-        document.getElementById('sidebar-name').addEventListener('blur', (e) => {
-            if (currentSidebarTicketId) {
-                updateTicket({ id: currentSidebarTicketId, name: e.target.value });
-            }
-        });
-
-        document.getElementById('sidebar-description').addEventListener('blur', (e) => {
-            if (currentSidebarTicketId) {
-                updateTicket({ id: currentSidebarTicketId, description: e.target.value });
-            }
-        });
-    }
-
-    // one event listener for the tickets container
-    function setupTicketCardEventDelegation() {
-        document.getElementById('tickets-container').addEventListener('click', (e) => {
-            const card = e.target.closest('.ticket-card');
-            if (!card) return;
-            
-            const ticketId = card.dataset.ticketId;
-            
-            // Toggle dropdowns
-            if (e.target.closest('.ticket-assignee')) {
-                e.stopPropagation();
-                toggleMenu(card.querySelector('.assignee-menu'));
-                return;
-            }
-            if (e.target.closest('.ticket-priority')) {
-                e.stopPropagation();
-                toggleMenu(card.querySelector('.priority-menu'));
-                return;
-            }
-            if (e.target.closest('.ticket-status')) {
-                e.stopPropagation();
-                toggleMenu(card.querySelector('.status-menu'));
-                return;
-            }
-            
-            // Handle menu selections
-            const btn = e.target.closest('button');
-            if (btn) {
-                e.stopPropagation();
-                
-                if (btn.dataset.assignee !== undefined) {
-                    updateTicket({ id: ticketId, assigned_to: btn.dataset.assignee || null });
-                    return;
-                } else if (btn.dataset.priority) {
-                    updateTicket({ id: ticketId, priority: parseInt(btn.dataset.priority) });
-                    return;
-                } else if (btn.dataset.status) {
-                    updateTicket({ id: ticketId, status: parseInt(btn.dataset.status) });
-                    return;
-                }
-            }
-            
-            // Click on the card itself (not on buttons/dropdowns) - show sidebar
-            showTicketSidebar(ticketId);
-        });
-    }
-    
-    function showTicketSidebar(ticketId) {
-        const ticket = ticketsCache.find(t => t.id === ticketId);
-        if (!ticket) return;
-        
-        currentSidebarTicketId = ticketId;
-        
-        const assignedTech = techniciansCache.find(t => t.id === ticket.assigned_to);
-        
-        // Name (input)
-        document.getElementById('sidebar-name').value = ticket.name || '';
-        
-        // Description (textarea)
-        document.getElementById('sidebar-description').value = ticket.description || '';
-        
-        // Assignee
-        document.getElementById('sidebar-assignee-name').textContent = assignedTech ? assignedTech.name : 'Unassigned';
-        
-        // Populate assignee dropdown
-        const assigneeMenu = document.getElementById('sidebar-assignee-menu');
-        // Keep the "Unassigned" button, remove dynamically added ones
-        assigneeMenu.querySelectorAll('button:not([data-assignee=""])').forEach(btn => btn.remove());
-        techniciansCache.forEach(tech => {
-            const btn = document.createElement('button');
-            btn.className = 'w-full text-left px-3 py-1.5 hover:bg-gray-100 text-sm';
-            btn.dataset.assignee = tech.id;
-            btn.textContent = tech.name;
-            assigneeMenu.appendChild(btn);
-        });
-        
-        // Status with badge
-        const statusEl = document.getElementById('sidebar-status');
-        statusEl.textContent = getStatusText(ticket.status);
-        statusEl.className = 'text-xs px-2 py-1 rounded-full cursor-pointer hover:opacity-70 ' + getStatusColor(ticket.status);
-        
-        // Priority with icon
-        document.getElementById('sidebar-priority').innerHTML = getPriorityIcon(ticket.priority) + `<span>${getPriorityText(ticket.priority)}</span>`;
-        
-        // Created date
-        if (ticket.created_at) {
-            document.getElementById('sidebar-created').textContent = new Date(ticket.created_at).toLocaleString();
-        } else {
-            document.getElementById('sidebar-created').textContent = 'Unknown';
-        }
-
-        showSidebar();
-    }
-
-    function showSidebar() {
-        document.getElementById('ticket-sidebar').classList.remove('w-0');
-        document.getElementById('ticket-sidebar').classList.add('w-80', 'p-4');
-    }
-    
-    function closeSidebar() {
-        currentSidebarTicketId = null;
-        document.getElementById('ticket-sidebar').classList.remove('w-80', 'p-4');
-        document.getElementById('ticket-sidebar').classList.add('w-0');
-    }
-
-    async function loadTickets() {
-        try {
-            const response = await fetch('/api/tickets');
-            const data = await response.json();
-            
-            if (data.success) {
-                ticketsCache = data.tickets;
-                applyFilters();
-                
-                // Refresh sidebar if it's open
-                if (currentSidebarTicketId) {
-                    showTicketSidebar(currentSidebarTicketId);
-                }
-            }
-        } catch (error) {
-            console.error('Error loading tickets:', error);
-        }
-    }
-
-    function renderTickets(tickets) {
-        const container = document.getElementById('tickets-container');
-        const template = document.getElementById('ticket-template');
-        
-        container.innerHTML = '';
-        
-        if (tickets.length === 0) {
-            container.innerHTML = '<p class="text-gray-500">No tickets found.</p>';
-            return;
-        }
-        
-        tickets.forEach(ticket => {
-            const clone = template.content.cloneNode(true);
-            const card = clone.querySelector('.ticket-card');
-            card.dataset.ticketId = ticket.id;
-            
-            // Name
-            clone.querySelector('.ticket-name').textContent = ticket.name;
-            
-            // Assignee
-            const assignedTech = techniciansCache.find(t => t.id === ticket.assigned_to);
-            clone.querySelector('.assignee-name').textContent = assignedTech ? assignedTech.name : 'Unassigned';
-            
-            // Populate assignee dropdown
-            const assigneeMenu = clone.querySelector('.assignee-menu');
-            techniciansCache.forEach(tech => {
-                const btn = document.createElement('button');
-                btn.className = 'w-full text-left px-3 py-1.5 hover:bg-gray-100 text-sm';
-                btn.dataset.assignee = tech.id;
-                btn.textContent = tech.name;
-                assigneeMenu.appendChild(btn);
-            });
-            
-            // Status
-            const statusEl = clone.querySelector('.ticket-status');
-            statusEl.textContent = getStatusText(ticket.status);
-            statusEl.className += ' ' + getStatusColor(ticket.status);
-            
-            // Priority
-            clone.querySelector('.ticket-priority').innerHTML = getPriorityIcon(ticket.priority);
-            
-            container.appendChild(clone);
-        });
-    }
-    
-    function toggleMenu(menu) {
-        closeAllMenus();
-        menu.classList.toggle('hidden');
-    }
-
-    function closeAllMenus() {
-        document.querySelectorAll('.status-menu, .priority-menu, .assignee-menu, #sidebar-status-menu, #sidebar-priority-menu, #sidebar-assignee-menu, #filter-technician-menu, #filter-status-menu, #filter-priority-menu').forEach(menu => {
-            menu.classList.add('hidden');
-        });
-    }
-
-    document.addEventListener('click', closeAllMenus);
-
-    function getStatusText(status) {
-        const statuses = { 1: 'Open', 2: 'In Progress', 3: 'Closed' };
-        return statuses[status] || 'Unknown';
-    }
-
-    function getStatusColor(status) {
-        const colors = {
-            1: 'bg-yellow-100 text-yellow-800',
-            2: 'bg-blue-100 text-blue-800',
-            3: 'bg-green-100 text-green-800'
-        };
-        return colors[status] || 'bg-gray-100 text-gray-800';
-    }
-
-    function getPriorityIcon(priority) {
-        const icons = {
-            1: '<img src="/static/images/low-priority.svg" class="w-4 h-4" alt="Low Priority" />',
-            2: '<img src="/static/images/medium-priority.svg" class="w-4 h-4" alt="Medium Priority" />',
-            3: '<img src="/static/images/high-priority.svg" class="w-4 h-4" alt="High Priority" />'
-        };
-        return icons[priority] || '';
-    }
-    
-    function getPriorityText(priority) {
-        const priorities = { 1: 'Low', 2: 'Medium', 3: 'High' };
-        return priorities[priority] || 'Unknown';
-    }
-
-    async function updateTicket(ticket) {
-        try {
-            const response = await fetch('/api/tickets/update', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(ticket)
-            });
-            
-            if (response.ok) {
-                await loadTickets();
-            } else {
-                console.error('Failed to update ticket');
-            }
-        } catch (error) {
-            console.error('Error updating ticket:', error);
-        }
-    }
-
-    async function fetchTechnicians() {
-        try {
-            const response = await fetch('/api/users?role=technician');
-            const data = await response.json();
-            return data.users || [];
-        } catch (error) {
-            console.error('Error fetching technicians:', error);
-            return [];
-        }
-    }
-</script>
+<script src="/static/js/dashboard_manager.js"></script>
 {% endblock %}
