@@ -138,6 +138,30 @@ document.addEventListener('click', closeAllMenus);
 // Filter Functions
 // ===================
 
+function setFilterTechnician(technicianId) {
+    filters.technician = technicianId;
+    updateFilterUI();
+    applyFilters();
+}
+
+function setFilterPriority(priority) {
+    filters.priority = priority;
+    updateFilterUI();
+    applyFilters();
+}
+
+function setFilterStatus(status) {
+    filters.status = status;
+    updateFilterUI();
+    applyFilters();
+}
+
+function clearFilters() {
+    filters = { technician: '', status: '', priority: '' };
+    updateFilterUI();
+    applyFilters();
+}
+
 function setupFilterEvents() {
     // Toggle filter dropdowns
     document.getElementById('filter-technician-btn').addEventListener('click', (e) => {
@@ -154,41 +178,6 @@ function setupFilterEvents() {
         e.stopPropagation();
         toggleMenu(document.getElementById('filter-priority-menu'));
     });
-    
-    // Handle filter selections
-    document.getElementById('filter-technician-menu').addEventListener('click', (e) => {
-        const btn = e.target.closest('button');
-        if (btn && btn.dataset.filterTechnician !== undefined) {
-            filters.technician = btn.dataset.filterTechnician;
-            updateFilterUI();
-            applyFilters();
-        }
-    });
-    
-    document.getElementById('filter-status-menu').addEventListener('click', (e) => {
-        const btn = e.target.closest('button');
-        if (btn && btn.dataset.filterStatus !== undefined) {
-            filters.status = btn.dataset.filterStatus;
-            updateFilterUI();
-            applyFilters();
-        }
-    });
-    
-    document.getElementById('filter-priority-menu').addEventListener('click', (e) => {
-        const btn = e.target.closest('button');
-        if (btn && btn.dataset.filterPriority !== undefined) {
-            filters.priority = btn.dataset.filterPriority;
-            updateFilterUI();
-            applyFilters();
-        }
-    });
-    
-    // Clear filters
-    document.getElementById('clear-filters-btn').addEventListener('click', () => {
-        filters = { technician: '', status: '', priority: '' };
-        updateFilterUI();
-        applyFilters();
-    });
 }
 
 function populateFilterTechnicians() {
@@ -197,7 +186,7 @@ function populateFilterTechnicians() {
     techniciansCache.forEach(tech => {
         const btn = document.createElement('button');
         btn.className = 'w-full text-left px-3 py-1.5 hover:bg-gray-100 text-sm';
-        btn.dataset.filterTechnician = tech.id;
+        btn.onclick = () => setFilterTechnician(tech.id);
         btn.textContent = tech.name;
         menu.appendChild(btn);
     });
