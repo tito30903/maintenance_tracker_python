@@ -30,7 +30,6 @@ async function init() {
     await loadTickets();
     setupTicketCardEventDelegation();
     setupSidebarEvents();
-    setupFilterEvents();
     populateFilterTechnicians();
 }
 
@@ -122,13 +121,18 @@ function getTechnicianName(techId) {
 // ===================
 
 function toggleMenu(menu) {
-    closeAllMenus();
-    menu.classList.toggle('hidden');
+    if (menu.classList.contains('hidden')) {
+        closeAllMenus();
+        menu.classList.remove('hidden');
+    } else {
+        menu.classList.add('hidden');
+    }
 }
 
 function closeAllMenus() {
     document.querySelectorAll('.status-menu, .priority-menu, .assignee-menu, #sidebar-status-menu, #sidebar-priority-menu, #sidebar-assignee-menu, #filter-technician-menu, #filter-status-menu, #filter-priority-menu').forEach(menu => {
         menu.classList.add('hidden');
+        console.log("this is still triggered");
     });
 }
 
@@ -156,28 +160,25 @@ function setFilterStatus(status) {
     applyFilters();
 }
 
+function toggleFilterTechnicianMenu(e) {
+    e.stopPropagation();
+    toggleMenu(document.getElementById('filter-technician-menu'));
+}
+
+function toggleFilterStatusMenu(e) {
+    e.stopPropagation();
+    toggleMenu(document.getElementById('filter-status-menu'));
+}
+
+function toggleFilterPriorityMenu(e) {
+    e.stopPropagation();
+    toggleMenu(document.getElementById('filter-priority-menu'));
+}
+
 function clearFilters() {
     filters = { technician: '', status: '', priority: '' };
     updateFilterUI();
     applyFilters();
-}
-
-function setupFilterEvents() {
-    // Toggle filter dropdowns
-    document.getElementById('filter-technician-btn').addEventListener('click', (e) => {
-        e.stopPropagation();
-        toggleMenu(document.getElementById('filter-technician-menu'));
-    });
-    
-    document.getElementById('filter-status-btn').addEventListener('click', (e) => {
-        e.stopPropagation();
-        toggleMenu(document.getElementById('filter-status-menu'));
-    });
-    
-    document.getElementById('filter-priority-btn').addEventListener('click', (e) => {
-        e.stopPropagation();
-        toggleMenu(document.getElementById('filter-priority-menu'));
-    });
 }
 
 function populateFilterTechnicians() {

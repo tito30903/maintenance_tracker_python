@@ -12,7 +12,7 @@
             <div class="flex flex-wrap gap-4 mb-6">
                 <!-- Technician filter -->
                 <div class="relative">
-                    <button id="filter-technician-btn" class="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                    <button id="filter-technician-btn" onclick="toggleFilterTechnicianMenu(event)" class="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
                         <img src="/static/images/person.svg" class="w-4 h-4" alt="Person" />
                         <span id="filter-technician-label" class="text-sm">All Technicians</span>
                         <img src="/static/images/chevron.svg" class="w-4 h-4" alt="Chevron" />
@@ -30,7 +30,7 @@
 
                 <!-- Status filter -->
                 <div class="relative">
-                    <button id="filter-status-btn" class="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                    <button id="filter-status-btn" onclick="toggleFilterStatusMenu(event)" class="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
                         <span id="filter-status-dot" class="w-2 h-2 rounded-full bg-gray-400"></span>
                         <span id="filter-status-label" class="text-sm">All Statuses</span>
                         <img src="/static/images/chevron.svg" class="w-4 h-4" alt="Chevron" />
@@ -42,7 +42,7 @@
 
                 <!-- Priority filter -->
                 <div class="relative">
-                    <button id="filter-priority-btn" class="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                    <button id="filter-priority-btn" onclick="toggleFilterPriorityMenu(event)" class="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
                         <span id="filter-priority-icon" class="w-4 h-4 text-gray-400">
                             <svg stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 10h16"></path>
