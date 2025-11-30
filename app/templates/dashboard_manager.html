@@ -300,9 +300,9 @@
     document.addEventListener('ticketCreated', loadTickets);
 
     async function init() {
-        techniciansCache = await getTechnicians();
+        techniciansCache = await fetchTechnicians();
         await loadTickets();
-        setupEventDelegation();
+        setupTicketCardEventDelegation();
         setupSidebarEvents();
         setupFilterEvents();
         populateFilterTechnicians();
@@ -363,8 +363,6 @@
     
     function populateFilterTechnicians() {
         const menu = document.getElementById('filter-technician-menu');
-        // Remove previously added technician buttons (keep "All" and "Unassigned")
-        menu.querySelectorAll('button:not([data-filter-technician=""]):not([data-filter-technician="unassigned"])').forEach(btn => btn.remove());
         
         techniciansCache.forEach(tech => {
             const btn = document.createElement('button');
@@ -440,8 +438,6 @@
     }
 
     function setupSidebarEvents() {
-        const sidebar = document.getElementById('ticket-sidebar');
-        
         // Toggle dropdowns
         document.getElementById('sidebar-status').addEventListener('click', (e) => {
             e.stopPropagation();
@@ -479,14 +475,14 @@
                 updateTicket({ id: currentSidebarTicketId, assigned_to: btn.dataset.assignee || null });
             }
         });
-        
-        // Handle name/description changes on blur
+
+        // Handle name/description changes on blur -> element lost focus
         document.getElementById('sidebar-name').addEventListener('blur', (e) => {
             if (currentSidebarTicketId) {
                 updateTicket({ id: currentSidebarTicketId, name: e.target.value });
             }
         });
-        
+
         document.getElementById('sidebar-description').addEventListener('blur', (e) => {
             if (currentSidebarTicketId) {
                 updateTicket({ id: currentSidebarTicketId, description: e.target.value });
@@ -495,7 +491,7 @@
     }
 
     // one event listener for the tickets container
-    function setupEventDelegation() {
+    function setupTicketCardEventDelegation() {
         document.getElementById('tickets-container').addEventListener('click', (e) => {
             const card = e.target.closest('.ticket-card');
             if (!card) return;
@@ -584,8 +580,11 @@
         } else {
             document.getElementById('sidebar-created').textContent = 'Unknown';
         }
-        
-        // Show sidebar
+
+        showSidebar();
+    }
+
+    function showSidebar() {
         document.getElementById('ticket-sidebar').classList.remove('w-0');
         document.getElementById('ticket-sidebar').classList.add('w-80', 'p-4');
     }
@@ -719,7 +718,7 @@
         }
     }
 
-    async function getTechnicians() {
+    async function fetchTechnicians() {
         try {
             const response = await fetch('/api/users?role=technician');
             const data = await response.json();
