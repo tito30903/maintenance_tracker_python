@@ -129,9 +129,7 @@
                 },
                 body: JSON.stringify({ name: ticketName })
             })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Ticket saved:', data);
+            .then(() => {
                 document.getElementById('ticketname').value = ''; // clear input field
                 // dispatch custom event to notify ticket creation
                 document.dispatchEvent(new CustomEvent('ticketCreated'));
@@ -143,6 +141,6 @@
         }
     </script>
 
-    <script src="{{ url_for('static', filename='js/auth_interceptor.js') }}"></script>
+    <script src="/static/js/auth_interceptor.js"></script>
 </body>
 </html>
