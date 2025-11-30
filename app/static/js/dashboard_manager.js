@@ -389,7 +389,7 @@ function setupSidebarEvents() {
         }
     });
 
-    // Handle name/description changes on blur
+    // triggered if name or description fields lose focus
     document.getElementById('sidebar-name').addEventListener('blur', (e) => {
         if (currentSidebarTicketId) {
             updateTicket({ id: currentSidebarTicketId, name: e.target.value });
