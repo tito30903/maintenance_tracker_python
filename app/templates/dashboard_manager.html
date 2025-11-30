@@ -12,13 +12,9 @@
                 <!-- Technician filter -->
                 <div class="relative">
                     <button id="filter-technician-btn" class="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-                        <svg class="w-4 h-4 text-gray-500" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                        </svg>
+                        <img src="/static/images/person.svg" class="w-4 h-4" alt="Person" />
                         <span id="filter-technician-label" class="text-sm">All Technicians</span>
-                        <svg class="w-4 h-4 text-gray-400" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                        </svg>
+                        <img src="/static/images/chevron.svg" class="w-4 h-4" alt="Chevron" />
                     </button>
                     <div id="filter-technician-menu" class="absolute left-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[180px] z-50 hidden">
                         <button class="w-full text-left px-3 py-1.5 hover:bg-gray-100 text-sm" data-filter-technician="">
@@ -36,9 +32,7 @@
                     <button id="filter-status-btn" class="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
                         <span id="filter-status-dot" class="w-2 h-2 rounded-full bg-gray-400"></span>
                         <span id="filter-status-label" class="text-sm">All Statuses</span>
-                        <svg class="w-4 h-4 text-gray-400" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                        </svg>
+                        <img src="/static/images/chevron.svg" class="w-4 h-4" alt="Chevron" />
                     </button>
                     <div id="filter-status-menu" class="absolute left-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[150px] z-50 hidden">
                         <button class="w-full text-left px-3 py-1.5 hover:bg-gray-100 text-sm" data-filter-status="">
@@ -66,35 +60,24 @@
                             </svg>
                         </span>
                         <span id="filter-priority-label" class="text-sm">All Priorities</span>
-                        <svg class="w-4 h-4 text-gray-400" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                        </svg>
+                        <img src="/static/images/chevron.svg" class="w-4 h-4" alt="Chevron" />
+
                     </button>
                     <div id="filter-priority-menu" class="absolute left-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[150px] z-50 hidden">
                         <button class="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 text-sm" data-filter-priority="">
-                            <svg class="w-4 h-4 text-gray-400" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 10h16"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 14h16"></path>
-                            </svg>
+                            <img src="{{ url_for('static', filename='images/all-priorities.svg') }}" class="w-4 h-4" alt="all priorities" />
                             All Priorities
                         </button>
                         <button class="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 text-sm" data-filter-priority="3">
-                            <svg class="w-4 h-4 text-red-500" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
-                            </svg>
+                            <img src="/static/images/high-priority.svg" class="w-4 h-4" alt="High Priority" />
                             High
                         </button>
                         <button class="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 text-sm" data-filter-priority="2">
-                            <svg class="w-4 h-4 text-yellow-500" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 10h16"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 14h16"></path>
-                            </svg>
+                            <img src="/static/images/medium-priority.svg" class="w-4 h-4" alt="Medium Priority" />
                             Medium
                         </button>
                         <button class="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 text-sm" data-filter-priority="1">
-                            <svg class="w-4 h-4 text-green-500" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-                            </svg>
+                            <img src="/static/images/low-priority.svg" class="w-4 h-4" alt="Low Priority" />
                             Low
                         </button>
                     </div>
@@ -164,22 +147,15 @@
                     <button id="sidebar-priority" class="flex items-center gap-2 cursor-pointer hover:opacity-70"></button>
                     <div id="sidebar-priority-menu" class="absolute left-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[120px] z-50 hidden">
                         <button class="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 text-sm" data-priority="3">
-                            <svg class="w-4 h-4 text-red-500" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
-                            </svg>
+                            <img src="/static/images/high-priority.svg" class="w-4 h-4" alt="High Priority" />
                             High
                         </button>
                         <button class="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 text-sm" data-priority="2">
-                            <svg class="w-4 h-4 text-yellow-500" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 10h16"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 14h16"></path>
-                            </svg>
+                            <img src="/static/images/medium-priority.svg" class="w-4 h-4" alt="Medium Priority" />
                             Medium
                         </button>
                         <button class="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 text-sm" data-priority="1">
-                            <svg class="w-4 h-4 text-green-500" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-                            </svg>
+                            <img src="/static/images/low-priority.svg" class="w-4 h-4" alt="Low Priority" />
                             Low
                         </button>
                     </div>
@@ -191,9 +167,7 @@
                 <label class="text-xs text-gray-500 uppercase tracking-wide">Assignee</label>
                 <div class="relative mt-1">
                     <button id="sidebar-assignee" class="flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700 cursor-pointer hover:opacity-70">
-                        <svg class="w-4 h-4" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                        </svg>
+                        <img src="/static/images/person.svg" class="w-4 h-4" alt="Person" />
                         <span id="sidebar-assignee-name">Unassigned</span>
                     </button>
                     <div id="sidebar-assignee-menu" class="absolute left-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[150px] z-50 hidden">
@@ -223,9 +197,7 @@
                 <!-- Technician assignment -->
                 <div class="relative flex items-center">
                     <button class="ticket-assignee cursor-pointer hover:opacity-70 flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">
-                        <svg class="w-4 h-4" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                        </svg>
+                        <img src="/static/images/person.svg" class="w-4 h-4" alt="Person" />
                         <span class="assignee-name">Unassigned</span>
                     </button>
                     <!-- Assignment dropdown -->
@@ -243,22 +215,15 @@
                     <!-- Priority dropdown -->
                     <div class="priority-menu absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[120px] z-50 hidden">
                         <button class="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 text-sm" data-priority="3">
-                            <svg class="w-4 h-4 text-red-500" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
-                            </svg>
+                            <img src="/static/images/high-priority.svg" class="w-4 h-4" alt="High Priority" />
                             High
                         </button>
                         <button class="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 text-sm" data-priority="2">
-                            <svg class="w-4 h-4 text-yellow-500" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 10h16"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 14h16"></path>
-                            </svg>
+                            <img src="/static/images/medium-priority.svg" class="w-4 h-4" alt="Medium Priority" />
                             Medium
                         </button>
                         <button class="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 text-sm" data-priority="1">
-                            <svg class="w-4 h-4 text-green-500" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-                            </svg>
+                            <img src="/static/images/low-priority.svg" class="w-4 h-4" alt="Low Priority" />
                             Low
                         </button>
                     </div>
@@ -688,9 +653,9 @@
 
     function getPriorityIcon(priority) {
         const icons = {
-            1: '<svg class="w-5 h-5 text-green-500" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>',
-            2: '<svg class="w-5 h-5 text-yellow-500" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 10h16"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 14h16"></path></svg>',
-            3: '<svg class="w-5 h-5 text-red-500" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>'
+            1: '<img src="/static/images/low-priority.svg" class="w-4 h-4" alt="Low Priority" />',
+            2: '<img src="/static/images/medium-priority.svg" class="w-4 h-4" alt="Medium Priority" />',
+            3: '<img src="/static/images/high-priority.svg" class="w-4 h-4" alt="High Priority" />'
         };
         return icons[priority] || '';
     }
