@@ -351,23 +351,22 @@ function renderTickets(tickets) {
 // Sidebar Functions
 // ===================
 
+function toggleSidebarStatusMenu(e) {
+    e.stopPropagation();
+    toggleMenu(document.getElementById('sidebar-status-menu'));
+}
+
+function toggleSidebarPriorityMenu(e) {
+    e.stopPropagation();
+    toggleMenu(document.getElementById('sidebar-priority-menu'));
+}
+
+function toggleSidebarAssigneeMenu(e) {
+    e.stopPropagation();
+    toggleMenu(document.getElementById('sidebar-assignee-menu'));
+}
+
 function setupSidebarEvents() {
-    // Toggle dropdowns
-    document.getElementById('sidebar-status').addEventListener('click', (e) => {
-        e.stopPropagation();
-        toggleMenu(document.getElementById('sidebar-status-menu'));
-    });
-    
-    document.getElementById('sidebar-priority').addEventListener('click', (e) => {
-        e.stopPropagation();
-        toggleMenu(document.getElementById('sidebar-priority-menu'));
-    });
-    
-    document.getElementById('sidebar-assignee').addEventListener('click', (e) => {
-        e.stopPropagation();
-        toggleMenu(document.getElementById('sidebar-assignee-menu'));
-    });
-    
     // Handle dropdown selections
     document.getElementById('sidebar-status-menu').addEventListener('click', (e) => {
         const btn = e.target.closest('button');
