@@ -15,11 +15,11 @@
 
         <div class="ml-auto flex flex-row items-center gap-4 h-8">
             <button class="h-full" onclick="addTicket()">
-                <img src="{{ url_for('static', filename='images/plus.png') }}" alt="plus" class="h-5 w-5 object-contain">
+                <img src="/static/images/plus.png" alt="plus" class="h-5 w-5 object-contain">
             </button>
             <div class="relative h-full">
                 <button class="h-full" onclick="toggleProfileOptions()">
-                    <img src="{{ url_for('static', filename='images/profile.png') }}" alt="profile" class="h-7 w-7 object-contain">
+                    <img src="/static/images/profile.png" alt="profile" class="h-7 w-7 object-contain">
                 </button>
                 <!-- Profile options dropdown (hidden by default) -->
                 <div id="profile-options" class="absolute right-0 top-full mt-2 bg-white rounded-lg shadow-lg border border-gray-200 py-2 min-w-[160px] z-50 hidden">
