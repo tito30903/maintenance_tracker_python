@@ -1,10 +1,9 @@
-from flask import Blueprint, render_template, request, jsonify, redirect, Response
+from flask import Blueprint, render_template, request, jsonify, Response
 
-from .constants import LOGIN_URL, REGISTER_URL, DASHBOARD_URL, DEBUG_DUMP_USERS_URL, DEBUG_URL, UNAUTHORIZED, \
-    DEBUG_DUMP_TICKETS_URL, API_TICKET
+from . import db
+from .auth_decorator import authorized
+from .constants import *
 from .models import UserRoles
-from .supabase_client import supabase
-from .db import verify_user, register_user, validate_token
 
 main = Blueprint('main', __name__)
 
@@ -12,15 +11,14 @@ main = Blueprint('main', __name__)
 def index():
     return render_template('index.html')
 
+# LOGIN AND REGISTRATION ROUTES
 @main.route(LOGIN_URL, methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
 
-        response = verify_user(email, password)
-
-        print(response)
+        response = db.verify_user(email, password)
 
         if isinstance(response, tuple):
             return jsonify({"success": True, "token": response[0], "role": response[1].__str__()}), 200
@@ -38,49 +36,58 @@ def register():
         password = request.form['password']
 
         # Insert into Supabase
-        return register_user(username, email, password)
+        return db.register_user(username, email, password)
     return render_template('register.html')
 
-@main.route(DASHBOARD_URL, methods=['GET'])
-def dashboard():
-    # TODO change later to correct generic dashboard
+# DASHBOARD ROUTES
+@main.route(DASHBOARD_MANAGER_URL, methods=['GET'])
+def dashboard_manager():
     return render_template('dashboard_manager.html')
 
-@main.route(DASHBOARD_URL + '/data', methods=['GET'])
-def dashboard_data():
-    token = request.headers.get('Token')
+@main.route(DASHBOARD_TECHNICIAN_URL, methods=['GET'])
+def dashboard_technician():
+    return render_template('dashboard_technician.html')
 
-    if token is None:
-        return redirect(LOGIN_URL)
-
-    role = validate_token(token)
-
-    if role is None:
-        return Response(status=401)
-
-    # Example data based on role
-    if role == UserRoles.MANAGER:
-        data = {"tasks": ["Approve budgets", "Review reports", "Manage team"]}
-    elif role == UserRoles.TECHNICIAN:
-        data = {"tasks": ["Fix issues", "Update systems", "Report status"]}
-    else:
-        data = {"tasks": []}
-
-    return jsonify({"success": True, "data": data})
-
-@main.route(API_TICKET + '/create', methods=['POST'])
-def create_ticket():
-    token = request.headers.get('Token')
-    if token is None:
-        return Response(status=401)
-
-    if validate_token(token) is None:
-        return Response(status=401)
-
+# API ROUTES
+@main.route(API_TICKETS + '/create', methods=['POST'])
+@authorized
+def create_ticket(user_id: str):
     ticket_name = request.get_json().get('name')
-
-    supabase.table('tickets').insert({'name': ticket_name}).execute()
+    db.create_ticket(ticket_name, "Description", 1, user_id)
     return Response(status=201)
+
+@main.route(API_TICKETS, methods=['GET'])
+@authorized
+def get_all_tickets(role: UserRoles, user_id: str):
+    if role == UserRoles.MANAGER:
+        tickets = db.get_tickets(None)
+    else:
+        tickets = db.get_tickets(user_id)
+    return jsonify({"success": True, "tickets": tickets})
+
+@main.route(API_TICKETS + '/update', methods=['PUT'])
+@authorized
+def update_ticket_priority():
+    ticket_update = request.json
+
+    if db.update_ticket(ticket_update):
+        return jsonify({"success": True})
+    return Response(status=400)
+
+@main.route(API_USERS, methods=['GET'])
+@authorized
+def get_users():
+    role = request.args.get('role')
+    if role:
+        user_role = UserRoles.get_role_by_name(role)
+
+        if user_role is None:
+            return jsonify({"success": False, "message": "Invalid role"}), 400
+        users = db.get_users_by_role(user_role)
+        return jsonify({"success": True, "users": users})
+
+    users = db.get_users_by_role(UserRoles.TECHNICIAN)
+    return jsonify({"success": True, "users": users})
 
 @main.route(UNAUTHORIZED, methods=['GET'])
 def unauthorized():
@@ -90,14 +97,15 @@ def unauthorized():
 def about():
     return "This is a Flask project template!"
 
+# DEBUG ROUTES
 @main.route(DEBUG_URL + DEBUG_DUMP_USERS_URL, methods=['GET'])
 def dump_users():
-    users = supabase.table('users').select("*").execute()
+    users = db._get_users()
     print(users)
-    return users.data
+    return users
 
 @main.route(DEBUG_URL + DEBUG_DUMP_TICKETS_URL, methods=['GET'])
 def dump_tickets():
-    tickets = supabase.table('tickets').select("*").execute()
+    tickets = db.get_tickets(None)
     print(tickets)
-    return tickets.data
+    return tickets

@@ -5,7 +5,7 @@
     <title>Flask App</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
 </head>
-<body>
+<body class="min-h-screen flex flex-col">
     <!-- header bar -->
     <div class="flex flex-row items-center gap-2 m-4">
         <h3 class="text-2xl">Maintenance Tracker</h3>
@@ -17,18 +17,33 @@
             <button class="h-full" onclick="addTicket()">
                 <img src="{{ url_for('static', filename='images/plus.png') }}" alt="plus" class="h-5 w-5 object-contain">
             </button>
-            <button class="h-full">
-                <img src="{{ url_for('static', filename='images/profile.png') }}" alt="profile" class="h-7 w-7 object-contain">
-            </button>
+            <div class="relative h-full">
+                <button class="h-full" onclick="toggleProfileOptions()">
+                    <img src="{{ url_for('static', filename='images/profile.png') }}" alt="profile" class="h-7 w-7 object-contain">
+                </button>
+                <!-- Profile options dropdown (hidden by default) -->
+                <div id="profile-options" class="absolute right-0 top-full mt-2 bg-white rounded-lg shadow-lg border border-gray-200 py-2 min-w-[160px] z-50 hidden">
+                    <button class="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm" onclick="viewProfile()">
+                        View Profile
+                    </button>
+                    <button class="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm" onclick="settings()">
+                        Settings
+                    </button>
+                    <hr class="my-1 border-gray-200">
+                    <button class="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm text-red-600" onclick="logout()">
+                        Logout
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Overlay (hidden by default) -->
-    <div id="overlay" class="fixed inset-0 backdrop-blur-xs bg-gray-200/[20%] flex items-center justify-center z-50 hidden">
+    <div id="ticket-overlay" class="fixed inset-0 backdrop-blur-xs bg-gray-200/[20%] flex items-center justify-center z-50 hidden">
         <div class="custom-border">
             <div class="flex flex-row items-center justify-between">
                 <h3 class="text-2xl font-bold">Add Ticket</h3>
-                <button onclick="closeOverlay()">
+                <button onclick="closeTicketOverlay()">
                     <img src="{{ url_for('static', filename='images/plus.png') }}" alt="close" class="h-6 w-6 object-contain rotate-45">
                 </button>
             </div>
@@ -47,32 +62,67 @@
         </div>
     </div>
 
-    {% block content %}{% endblock %}
+    <div class="flex-1 flex flex-col">
+        {% block content %}{% endblock %}
+    </div>
 
     <script>
+        // =======================================
+        // ON INIT
         // set role badge on init from localStorage
         document.addEventListener('DOMContentLoaded', function() {
-        const role = localStorage.getItem('role');
-        if (role) {
-            document.getElementById('role-badge').textContent = role;
+            const role = localStorage.getItem('role');
+            if (role) {
+                // capitalize first letter and set badge text
+                document.getElementById('role-badge').textContent = role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
+            }
+        });
+
+        // =======================================
+        // PROFILE DROPDOWN FUNCTIONS
+        function toggleProfileOptions() {
+            document.getElementById('profile-options').classList.toggle('hidden');
         }
-    });
+        function hideProfileOptions() {
+            document.getElementById('profile-options').classList.add('hidden');
+        }
+        function viewProfile() {
+            console.log('View Profile clicked');
+            hideProfileOptions();
+        }
+        function settings() {
+            console.log('Settings clicked');
+            hideProfileOptions();
+        }
+        function logout() {
+            localStorage.clear();
+            window.location.href = '/login';
+        }
 
+        // close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const profileOptions = document.getElementById('profile-options');
+            const profileButton = event.target.closest('.relative');
+            if (!profileButton && !profileOptions.classList.contains('hidden')) {
+                hideProfileOptions();
+            }
+        });
 
+        // =======================================
+        // TICKET OVERLAY FUNCTIONS
         function addTicket() {
-            document.getElementById('overlay').classList.remove('hidden');
-            console.log("Add Ticket button clicked");
+            document.getElementById('ticket-overlay').classList.remove('hidden');
+            document.getElementById('ticketname').select()
         }
-        function closeOverlay() {
-            document.getElementById('overlay').classList.add('hidden');
+        function closeTicketOverlay() {
+            document.getElementById('ticket-overlay').classList.add('hidden');
+            document.getElementById('ticketname').value = ''; // clear input field
         }
 
         function saveTicket() {
             const ticketName = document.getElementById('ticketname').value;
-            console.log("Saving ticket:", ticketName);
-            // Here you would typically send the ticket data to the server
 
-            fetch('/api/ticket/create', {
+            fetch('/api/tickets/create', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -82,17 +132,17 @@
             .then(response => response.json())
             .then(data => {
                 console.log('Ticket saved:', data);
-                // Optionally refresh ticket list or show a success message
                 document.getElementById('ticketname').value = ''; // clear input field
+                // dispatch custom event to notify ticket creation
+                document.dispatchEvent(new CustomEvent('ticketCreated'));
             })
             .catch(error => {
                 console.error('Error saving ticket:', error);
             })
-            .finally(closeOverlay);
+            .finally(closeTicketOverlay);
         }
     </script>
 
     <script src="{{ url_for('static', filename='js/auth_interceptor.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/fetch_data_after_init.js') }}"></script>
 </body>
 </html>
