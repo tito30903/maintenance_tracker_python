@@ -1,5 +1,4 @@
 {% extends 'dashboard_layout.html' %}
-{% from 'components/dropdowns.html' import status_menu_items, priority_menu_items, assignee_menu_base, filter_priority_menu_items, filter_status_menu_items %}
 
 {% block content %}
 <div class="flex flex-1">
@@ -18,13 +17,7 @@
                         <img src="/static/images/chevron.svg" class="w-4 h-4" alt="Chevron" />
                     </button>
                     <div id="filter-technician-menu" class="absolute left-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[180px] z-50 hidden">
-                        <button class="w-full text-left px-3 py-1.5 hover:bg-gray-100 text-sm" data-filter-technician="">
-                            All Technicians
-                        </button>
-                        <button class="w-full text-left px-3 py-1.5 hover:bg-gray-100 text-sm text-gray-500" data-filter-technician="unassigned">
-                            Unassigned
-                        </button>
-                        <!-- Technicians will be added here dynamically -->
+                        <!-- added automatically here in JS see initFilters -->
                     </div>
                 </div>
 
@@ -36,7 +29,7 @@
                         <img src="/static/images/chevron.svg" class="w-4 h-4" alt="Chevron" />
                     </button>
                     <div id="filter-status-menu" class="absolute left-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[150px] z-50 hidden">
-                        {{ filter_status_menu_items() }}
+                        <!-- added automatically here in JS see initFilters -->
                     </div>
                 </div>
 
@@ -54,7 +47,7 @@
 
                     </button>
                     <div id="filter-priority-menu" class="absolute left-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[150px] z-50 hidden">
-                        <!-- this is populated on init -->
+                        <!-- added automatically here in JS see initFilters -->
                     </div>
                 </div>
 
@@ -102,7 +95,7 @@
                 <div class="relative mt-1">
                     <button id="sidebar-status" onclick="toggleSidebarStatusMenu(event)" class="text-xs px-2 py-1 rounded-full cursor-pointer hover:opacity-70"></button>
                     <div id="sidebar-status-menu" class="absolute left-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[120px] z-50 hidden">
-                        {{ status_menu_items() }}
+                        <!-- automatically added in JS when sidebar is shown -->
                     </div>
                 </div>
             </div>
@@ -113,7 +106,7 @@
                 <div class="relative mt-1">
                     <button id="sidebar-priority" onclick="toggleSidebarPriorityMenu(event)" class="flex items-center gap-2 cursor-pointer hover:opacity-70"></button>
                     <div id="sidebar-priority-menu" class="absolute left-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[120px] z-50 hidden">
-                        {{ priority_menu_items() }}
+                        <!-- automatically added in JS when sidebar is shown -->
                     </div>
                 </div>
             </div>
@@ -127,7 +120,7 @@
                         <span id="sidebar-assignee-name">Unassigned</span>
                     </button>
                     <div id="sidebar-assignee-menu" class="absolute left-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[150px] z-50 hidden">
-                        {{ assignee_menu_base() }}
+                        <!-- added automatically via JS when sidebar is shown --->
                     </div>
                 </div>
             </div>
@@ -155,7 +148,7 @@
                     </button>
                     <!-- Assignment dropdown -->
                     <div class="assignee-menu absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[150px] z-50 hidden">
-                        {{ assignee_menu_base() }}
+                        <!-- added automatically via JS, see render tickets -->
                     </div>
                 </div>
                 
@@ -164,7 +157,7 @@
                     <button class="ticket-priority cursor-pointer hover:opacity-70 flex items-center justify-center w-6 h-6"></button>
                     <!-- Priority dropdown -->
                     <div class="priority-menu absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[120px] z-50 hidden">
-                        {{ priority_menu_items() }}
+                        <!-- added automatically via JS -->
                     </div>
                 </div>
                 <!-- Status -->
@@ -172,7 +165,7 @@
                     <button class="ticket-status text-xs px-2 py-1 rounded-full cursor-pointer hover:opacity-70"></button>
                     <!-- Status dropdown -->
                     <div class="status-menu absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[120px] z-50 hidden">
-                        {{ status_menu_items() }}
+                        <!-- added automatically via JS when ticket is rendered -->
                     </div>
                 </div>
             </div>

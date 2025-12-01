@@ -9,11 +9,12 @@ let filters = {
 };
 
 // Constants
-const STATUS_CONFIG = {
-    1: { text: 'Open', color: 'bg-yellow-100 text-yellow-800', dotColor: 'bg-yellow-400' },
-    2: { text: 'In Progress', color: 'bg-blue-100 text-blue-800', dotColor: 'bg-blue-400' },
-    3: { text: 'Closed', color: 'bg-green-100 text-green-800', dotColor: 'bg-green-400' }
-};
+const STATUSES = [
+    { text: 'All Status', color: 'bg-gray-100 text-gray-800', dotColor: 'bg-gray-400' },
+    { text: 'Open', color: 'bg-yellow-100 text-yellow-800', dotColor: 'bg-yellow-400' },
+    { text: 'In Progress', color: 'bg-blue-100 text-blue-800', dotColor: 'bg-blue-400' },
+    { text: 'Closed', color: 'bg-green-100 text-green-800', dotColor: 'bg-green-400' }
+];
 
 const PRIORITIES = [
     { id: "", name: "All Priorities", img: "all-priorities.svg" },
@@ -32,9 +33,13 @@ async function init() {
     await loadTickets();
     setupTicketCardEventDelegation();
     setupSidebarEvents();
-    populateFilterTechnicians();
+    initFilters();
+}
 
+function initFilters() {
     addPriorityButtonsToMenu(document.getElementById('filter-priority-menu'), setFilterPriority, true);
+    addAssigneeButtonsToMenu(document.getElementById('filter-technician-menu'), setFilterTechnician, true);
+    addStatusButtonsToMenu(document.getElementById('filter-status-menu'), setFilterStatus, true);
 }
 
 // ===================
@@ -93,15 +98,15 @@ async function updateTicket(ticket) {
 // ===================
 
 function getStatusText(status) {
-    return STATUS_CONFIG[status]?.text || 'Unknown';
+    return STATUSES[status]?.text || 'Unknown';
 }
 
 function getStatusColor(status) {
-    return STATUS_CONFIG[status]?.color || 'bg-gray-100 text-gray-800';
+    return STATUSES[status]?.color || 'bg-gray-100 text-gray-800';
 }
 
 function getStatusDotColor(status) {
-    return STATUS_CONFIG[status]?.dotColor || 'bg-gray-400';
+    return STATUSES[status]?.dotColor || 'bg-gray-400';
 }
 
 function getPriorityText(priority) {
@@ -194,18 +199,6 @@ function clearFilters() {
     applyFilters();
 }
 
-function populateFilterTechnicians() {
-    const menu = document.getElementById('filter-technician-menu');
-    
-    techniciansCache.forEach(tech => {
-        const btn = document.createElement('button');
-        btn.className = 'w-full text-left px-3 py-1.5 hover:bg-gray-100 text-sm';
-        btn.onclick = () => setFilterTechnician(tech.id);
-        btn.textContent = tech.name;
-        menu.appendChild(btn);
-    });
-}
-
 function updateFilterUI() {
     // Update technician filter label
     const techLabel = document.getElementById('filter-technician-label');
@@ -250,7 +243,7 @@ function updateFilterUI() {
 function applyFilters() {
     let filtered = [...ticketsCache];
     
-    if (filters.technician === 'unassigned') {
+    if (filters.technician === null) {
         filtered = filtered.filter(t => !t.assigned_to);
     } else if (filters.technician) {
         filtered = filtered.filter(t => t.assigned_to === filters.technician);
@@ -295,23 +288,6 @@ function setupTicketCardEventDelegation() {
             return;
         }
         
-        // Handle menu selections
-        const btn = e.target.closest('button');
-        if (btn) {
-            e.stopPropagation();
-            
-            if (btn.dataset.assignee !== undefined) {
-                updateTicket({ id: ticketId, assigned_to: btn.dataset.assignee || null });
-                return;
-            } else if (btn.dataset.priority) {
-                updateTicket({ id: ticketId, priority: parseInt(btn.dataset.priority) });
-                return;
-            } else if (btn.dataset.status) {
-                updateTicket({ id: ticketId, status: parseInt(btn.dataset.status) });
-                return;
-            }
-        }
-        
         // Click on the card itself - show sidebar
         showTicketSidebar(ticketId);
     });
@@ -332,7 +308,7 @@ function renderTickets(tickets) {
         const clone = template.content.cloneNode(true);
         const card = clone.querySelector('.ticket-card');
         card.dataset.ticketId = ticket.id;
-        
+
         // Name
         clone.querySelector('.ticket-name').textContent = ticket.name;
         
@@ -341,22 +317,24 @@ function renderTickets(tickets) {
         
         // Populate assignee dropdown
         const assigneeMenu = clone.querySelector('.assignee-menu');
-        techniciansCache.forEach(tech => {
-            const btn = document.createElement('button');
-            btn.className = 'w-full text-left px-3 py-1.5 hover:bg-gray-100 text-sm';
-            btn.dataset.assignee = tech.id;
-            btn.textContent = tech.name;
-            assigneeMenu.appendChild(btn);
-        });
+        addAssigneeButtonsToMenu(assigneeMenu, (assigneeId) => updateTicket({id: ticket.id, assigned_to: assigneeId}), false);
         
         // Status
         const statusEl = clone.querySelector('.ticket-status');
         statusEl.textContent = getStatusText(ticket.status);
         statusEl.className += ' ' + getStatusColor(ticket.status);
+
+        // Populate status dropdown
+        const statusMenu = clone.querySelector('.status-menu');
+        addStatusButtonsToMenu(statusMenu, (status) => updateTicket({id: ticket.id, status: status}), false);
         
         // Priority
         clone.querySelector('.ticket-priority').appendChild(getPriorityIcon(ticket.priority));
-        //addPriorityButtonsToMenu(clone.querySelector('.priority-menu'), )
+        addPriorityButtonsToMenu(
+            clone.querySelector('.priority-menu'),
+            (priority) => updateTicket({ id: ticket.id, priority: parseInt(priority) }),
+            false
+        );
         
         container.appendChild(clone);
     });
@@ -387,13 +365,6 @@ function setupSidebarEvents() {
         const btn = e.target.closest('button');
         if (btn && btn.dataset.status && currentSidebarTicketId) {
             updateTicket({ id: currentSidebarTicketId, status: parseInt(btn.dataset.status) });
-        }
-    });
-    
-    document.getElementById('sidebar-priority-menu').addEventListener('click', (e) => {
-        const btn = e.target.closest('button');
-        if (btn && btn.dataset.priority && currentSidebarTicketId) {
-            updateTicket({ id: currentSidebarTicketId, priority: parseInt(btn.dataset.priority) });
         }
     });
     
@@ -433,18 +404,18 @@ function showTicketSidebar(ticketId) {
     
     // Populate assignee dropdown
     const assigneeMenu = document.getElementById('sidebar-assignee-menu');
-    techniciansCache.forEach(tech => {
-        const btn = document.createElement('button');
-        btn.className = 'w-full text-left px-3 py-1.5 hover:bg-gray-100 text-sm';
-        btn.dataset.assignee = tech.id;
-        btn.textContent = tech.name;
-        assigneeMenu.appendChild(btn);
-    });
+    assigneeMenu.innerHTML = ''; // Clear existing content
+    addAssigneeButtonsToMenu(assigneeMenu, (assigneeId) => updateTicket({id: currentSidebarTicketId, assigned_to: assigneeId}), false);
     
     // Status
     const statusEl = document.getElementById('sidebar-status');
     statusEl.textContent = getStatusText(ticket.status);
     statusEl.className = 'text-xs px-2 py-1 rounded-full cursor-pointer hover:opacity-70 ' + getStatusColor(ticket.status);
+
+    // Populate status dropdown
+    const statusMenu = document.getElementById('sidebar-status-menu');
+    statusMenu.innerHTML = ''; // Clear existing content
+    addStatusButtonsToMenu(statusMenu, (status) => updateTicket({id: currentSidebarTicketId, status: status}), false);
     
     // Priority
     const sidebarPriority = document.getElementById('sidebar-priority');
@@ -453,6 +424,15 @@ function showTicketSidebar(ticketId) {
     const span = document.createElement('span');
     span.textContent = getPriorityText(ticket.priority);
     sidebarPriority.appendChild(span);
+
+    // priority dropdown
+    const priorityMenu = document.getElementById('sidebar-priority-menu');
+    priorityMenu.innerHTML = ''; // Clear existing content
+    addPriorityButtonsToMenu(priorityMenu, (priority) => {
+        if (currentSidebarTicketId) {
+            updateTicket({ id: currentSidebarTicketId, priority: parseInt(priority) });
+        }
+    }, false);
     
     // Created date
     document.getElementById('sidebar-created').textContent = ticket.created_at 
@@ -487,9 +467,62 @@ function addPriorityButtonsToMenu(menu, onclickAction, isFilter) {
         const img = getPriorityIcon(idx);
 
         priorityBtn.appendChild(img);
-        const textNode = document.createTextNode(priority.name);
+        const textNode = document.createTextNode(isFilter ? priority.name : priority.shortLabel);
         priorityBtn.appendChild(textNode);
 
         menu.appendChild(priorityBtn);
     }
 }
+
+function addAssigneeButtonsToMenu(menu, onclickAction, isFilter) {
+    const baseClasses = "w-full text-left px-3 py-1.5 hover:bg-gray-100 text-sm";
+
+    if (isFilter) {
+        const unassignedBtn = document.createElement('button');
+        unassignedBtn.className = baseClasses;
+        unassignedBtn.onclick = function() { onclickAction(""); };
+        unassignedBtn.textContent = "All Technicians"
+        menu.appendChild(unassignedBtn);
+    }
+
+    // add unassigned option
+    const unassignedBtn = document.createElement('button');
+    unassignedBtn.className = baseClasses + " text-gray-500";
+    unassignedBtn.onclick = function() { onclickAction(null); };
+    unassignedBtn.textContent = "Unassigned"
+    menu.appendChild(unassignedBtn);
+
+    // add all fetched technicians
+    for(let idx = 0; idx < techniciansCache.length; idx++) {
+        const tech = techniciansCache[idx];
+        const techBtn = document.createElement('button');
+        techBtn.className = baseClasses;
+        techBtn.onclick = function() { onclickAction(tech.id); };
+        techBtn.textContent = tech.name;
+
+        menu.appendChild(techBtn);
+    }
+}
+
+function addStatusButtonsToMenu(menu, onclickAction, isFilter) {
+    let startIdx = isFilter ? 0 : 1;
+
+    for(let idx = startIdx; idx < STATUSES.length; idx++) {
+        const status = STATUSES[idx];
+        const statusBtn = document.createElement('button');
+        statusBtn.className = "w-full text-left px-3 py-1.5 hover:bg-gray-100 text-sm flex items-center";
+        statusBtn.onclick = function() { onclickAction(idx); };
+
+        // Dot
+        const dot = document.createElement('span');
+        dot.className = `inline-block w-2 h-2 rounded-full mr-2 ${status.dotColor}`;
+        statusBtn.appendChild(dot);
+
+        // Label
+        const textNode = document.createTextNode(status.text);
+        statusBtn.appendChild(textNode);
+
+        menu.appendChild(statusBtn);
+    }
+}
+
