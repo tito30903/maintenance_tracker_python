@@ -31,7 +31,7 @@ document.addEventListener('ticketCreated', loadTickets);
 async function init() {
     techniciansCache = await fetchTechnicians();
     await loadTickets();
-    setupTicketCardEventDelegation();
+    setupShowTicketSidebarEventListener();
     setupSidebarEvents();
     initFilters();
 }
@@ -264,29 +264,33 @@ function applyFilters() {
 // Ticket Card Functions
 // ===================
 
-function setupTicketCardEventDelegation() {
+function toggleTicketAssigneeMenu(e) {
+    e.stopPropagation();
+    const card = e.target.closest('.ticket-card');
+    if (!card) return;
+    toggleMenu(card.querySelector('.assignee-menu'));
+}
+
+function toggleTicketPriorityMenu(e) {
+    e.stopPropagation();
+    const card = e.target.closest('.ticket-card');
+    if (!card) return;
+    toggleMenu(card.querySelector('.priority-menu'));
+}
+
+function toggleTicketStatusMenu(e) {
+    e.stopPropagation();
+    const card = e.target.closest('.ticket-card');
+    if (!card) return;
+    toggleMenu(card.querySelector('.status-menu'));
+}
+
+function setupShowTicketSidebarEventListener() {
     document.getElementById('tickets-container').addEventListener('click', (e) => {
         const card = e.target.closest('.ticket-card');
         if (!card) return;
         
         const ticketId = card.dataset.ticketId;
-        
-        // Toggle dropdowns
-        if (e.target.closest('.ticket-assignee')) {
-            e.stopPropagation();
-            toggleMenu(card.querySelector('.assignee-menu'));
-            return;
-        }
-        if (e.target.closest('.ticket-priority')) {
-            e.stopPropagation();
-            toggleMenu(card.querySelector('.priority-menu'));
-            return;
-        }
-        if (e.target.closest('.ticket-status')) {
-            e.stopPropagation();
-            toggleMenu(card.querySelector('.status-menu'));
-            return;
-        }
         
         // Click on the card itself - show sidebar
         showTicketSidebar(ticketId);
@@ -321,6 +325,7 @@ function renderTickets(tickets) {
         
         // Status
         const statusEl = clone.querySelector('.ticket-status');
+
         statusEl.textContent = getStatusText(ticket.status);
         statusEl.className += ' ' + getStatusColor(ticket.status);
 
@@ -360,21 +365,6 @@ function toggleSidebarAssigneeMenu(e) {
 }
 
 function setupSidebarEvents() {
-    // Handle dropdown selections
-    document.getElementById('sidebar-status-menu').addEventListener('click', (e) => {
-        const btn = e.target.closest('button');
-        if (btn && btn.dataset.status && currentSidebarTicketId) {
-            updateTicket({ id: currentSidebarTicketId, status: parseInt(btn.dataset.status) });
-        }
-    });
-    
-    document.getElementById('sidebar-assignee-menu').addEventListener('click', (e) => {
-        const btn = e.target.closest('button');
-        if (btn && btn.dataset.assignee !== undefined && currentSidebarTicketId) {
-            updateTicket({ id: currentSidebarTicketId, assigned_to: btn.dataset.assignee || null });
-        }
-    });
-
     // triggered if name or description fields lose focus
     document.getElementById('sidebar-name').addEventListener('blur', (e) => {
         if (currentSidebarTicketId) {
@@ -462,7 +452,10 @@ function addPriorityButtonsToMenu(menu, onclickAction, isFilter) {
         const priority = PRIORITIES[idx];
         const priorityBtn = document.createElement('button');
         priorityBtn.className = "w-full flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 text-sm";
-        priorityBtn.onclick = function() { onclickAction(priority.id); };
+        priorityBtn.onclick = function(event) {
+            event.stopPropagation();
+            onclickAction(priority.id);
+        };
 
         const img = getPriorityIcon(idx);
 
@@ -480,7 +473,10 @@ function addAssigneeButtonsToMenu(menu, onclickAction, isFilter) {
     if (isFilter) {
         const unassignedBtn = document.createElement('button');
         unassignedBtn.className = baseClasses;
-        unassignedBtn.onclick = function() { onclickAction(""); };
+        unassignedBtn.onclick = function(event) {
+            event.stopPropagation();
+            onclickAction("");
+        };
         unassignedBtn.textContent = "All Technicians"
         menu.appendChild(unassignedBtn);
     }
@@ -488,7 +484,10 @@ function addAssigneeButtonsToMenu(menu, onclickAction, isFilter) {
     // add unassigned option
     const unassignedBtn = document.createElement('button');
     unassignedBtn.className = baseClasses + " text-gray-500";
-    unassignedBtn.onclick = function() { onclickAction(null); };
+    unassignedBtn.onclick = function(event) {
+        event.stopPropagation();
+        onclickAction(null);
+    };
     unassignedBtn.textContent = "Unassigned"
     menu.appendChild(unassignedBtn);
 
@@ -497,7 +496,10 @@ function addAssigneeButtonsToMenu(menu, onclickAction, isFilter) {
         const tech = techniciansCache[idx];
         const techBtn = document.createElement('button');
         techBtn.className = baseClasses;
-        techBtn.onclick = function() { onclickAction(tech.id); };
+        techBtn.onclick = function(event) {
+            event.stopPropagation();
+            onclickAction(tech.id);
+        };
         techBtn.textContent = tech.name;
 
         menu.appendChild(techBtn);
@@ -511,7 +513,10 @@ function addStatusButtonsToMenu(menu, onclickAction, isFilter) {
         const status = STATUSES[idx];
         const statusBtn = document.createElement('button');
         statusBtn.className = "w-full text-left px-3 py-1.5 hover:bg-gray-100 text-sm flex items-center";
-        statusBtn.onclick = function() { onclickAction(idx); };
+        statusBtn.onclick = function(event) {
+            event.stopPropagation();
+            onclickAction(idx);
+        };
 
         // Dot
         const dot = document.createElement('span');

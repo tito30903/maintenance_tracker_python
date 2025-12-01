@@ -142,7 +142,7 @@
             <div class="flex items-center gap-2">
                 <!-- Technician assignment -->
                 <div class="relative flex items-center">
-                    <button class="ticket-assignee cursor-pointer hover:opacity-70 flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">
+                    <button onclick="toggleTicketAssigneeMenu(event)" class="cursor-pointer hover:opacity-70 flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">
                         <img src="/static/images/person.svg" class="w-4 h-4" alt="Person" />
                         <span class="assignee-name">Unassigned</span>
                     </button>
@@ -154,7 +154,7 @@
                 
                 <!-- Priority -->
                 <div class="relative flex items-center">
-                    <button class="ticket-priority cursor-pointer hover:opacity-70 flex items-center justify-center w-6 h-6"></button>
+                    <button onclick="toggleTicketPriorityMenu(event)" class="ticket-priority cursor-pointer hover:opacity-70 flex items-center justify-center w-6 h-6"></button>
                     <!-- Priority dropdown -->
                     <div class="priority-menu absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[120px] z-50 hidden">
                         <!-- added automatically via JS -->
@@ -162,7 +162,7 @@
                 </div>
                 <!-- Status -->
                 <div class="relative flex items-center">
-                    <button class="ticket-status text-xs px-2 py-1 rounded-full cursor-pointer hover:opacity-70"></button>
+                    <button onclick="toggleTicketStatusMenu(event)" class="ticket-status text-xs px-2 py-1 rounded-full cursor-pointer hover:opacity-70"></button>
                     <!-- Status dropdown -->
                     <div class="status-menu absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[120px] z-50 hidden">
                         <!-- added automatically via JS when ticket is rendered -->
