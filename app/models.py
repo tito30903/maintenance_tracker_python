@@ -21,9 +21,9 @@ class UserRoles(Enum):
         return self.name.lower()
 
 class TicketPriority(Enum):
-    LOW = 1
+    HIGH = 1
     MEDIUM = 2
-    HIGH = 3
+    LOW = 3
 
 class TicketStatus(Enum):
     OPEN = 1

@@ -15,7 +15,7 @@
 
 {# Priority dropdown menu items #}
 {% macro priority_menu_items() %}
-<button class="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 text-sm" data-priority="3">
+<button class="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 text-sm" data-priority="1">
     <img src="/static/images/high-priority.svg" class="w-4 h-4" alt="High Priority" />
     High
 </button>
@@ -23,7 +23,7 @@
     <img src="/static/images/medium-priority.svg" class="w-4 h-4" alt="Medium Priority" />
     Medium
 </button>
-<button class="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 text-sm" data-priority="1">
+<button class="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 text-sm" data-priority="3">
     <img src="/static/images/low-priority.svg" class="w-4 h-4" alt="Low Priority" />
     Low
 </button>
@@ -57,25 +57,5 @@
 </button>
 <button class="w-full text-left px-3 py-1.5 hover:bg-gray-100 text-sm" onclick="setFilterStatus('3')">
     <span class="inline-block w-2 h-2 rounded-full bg-green-400 mr-2"></span>Closed
-</button>
-{% endmacro %}
-
-{# Filter priority dropdown items (includes "All" option) #}
-{% macro filter_priority_menu_items() %}
-<button class="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 text-sm" onclick="setFilterPriority('')">
-    <img src="/static/images/all-priorities.svg" class="w-4 h-4" alt="All Priorities" />
-    All Priorities
-</button>
-<button class="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 text-sm" onclick="setFilterPriority('3')">
-    <img src="/static/images/high-priority.svg" class="w-4 h-4" alt="High Priority" />
-    High
-</button>
-<button class="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 text-sm" onclick="setFilterPriority('2')">
-    <img src="/static/images/medium-priority.svg" class="w-4 h-4" alt="Medium Priority" />
-    Medium
-</button>
-<button class="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 text-sm" onclick="setFilterPriority('1')">
-    <img src="/static/images/low-priority.svg" class="w-4 h-4" alt="Low Priority" />
-    Low
 </button>
 {% endmacro %}

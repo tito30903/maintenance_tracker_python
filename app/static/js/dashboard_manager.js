@@ -15,11 +15,13 @@ const STATUS_CONFIG = {
     3: { text: 'Closed', color: 'bg-green-100 text-green-800', dotColor: 'bg-green-400' }
 };
 
-const PRIORITY_CONFIG = {
-    1: { text: 'Low', icon: '/static/images/low-priority.svg' },
-    2: { text: 'Medium', icon: '/static/images/medium-priority.svg' },
-    3: { text: 'High', icon: '/static/images/high-priority.svg' }
-};
+const PRIORITIES = [
+    { id: "", name: "All Priorities", img: "all-priorities.svg" },
+    { id: "1", name: "High Priority", shortLabel:"High", img: "high-priority.svg" },
+    { id: "2", name: "Medium Priority", shortLabel: "Medium", img: "medium-priority.svg" },
+    { id: "3", name: "Low Priority", shortLabel: "Low", img: "low-priority.svg" }
+];
+
 
 // Initialize
 document.addEventListener('DOMContentLoaded', init);
@@ -31,6 +33,8 @@ async function init() {
     setupTicketCardEventDelegation();
     setupSidebarEvents();
     populateFilterTechnicians();
+
+    addPriorityButtonsToMenu(document.getElementById('filter-priority-menu'), setFilterPriority, true);
 }
 
 // ===================
@@ -101,13 +105,22 @@ function getStatusDotColor(status) {
 }
 
 function getPriorityText(priority) {
-    return PRIORITY_CONFIG[priority]?.text || 'Unknown';
+    return PRIORITIES[priority].shortLabel || 'Unknown';
 }
 
-function getPriorityIcon(priority) {
-    const config = PRIORITY_CONFIG[priority];
-    if (!config) return '';
-    return `<img src="${config.icon}" class="w-4 h-4" alt="${config.text} Priority" />`;
+function getPriorityIcon(idx) {
+    const priority = PRIORITIES[idx];
+
+    if (!priority) {
+        console.error("Invalid priority:", idx);
+        return document.createTextNode(''); // return empty node
+    }
+
+    const img = document.createElement('img');
+    img.src = "/static/images/" + priority.img;
+    img.className = "w-4 h-4";
+    img.alt = priority.name;
+    return img;
 }
 
 function getTechnicianName(techId) {
@@ -219,12 +232,13 @@ function updateFilterUI() {
     // Update priority filter
     const priorityIcon = document.getElementById('filter-priority-icon');
     const priorityLabel = document.getElementById('filter-priority-label');
+    priorityIcon.innerHTML = ''; // Clear existing content
     if (filters.priority === '') {
-        priorityIcon.innerHTML = '<img src="/static/images/all-priorities.svg" class="w-4 h-4" alt="All Priorities" />';
+        priorityIcon.appendChild(getPriorityIcon(0));
         priorityLabel.textContent = 'All Priorities';
     } else {
         const priorityNum = parseInt(filters.priority);
-        priorityIcon.innerHTML = getPriorityIcon(priorityNum);
+        priorityIcon.appendChild(getPriorityIcon(priorityNum));
         priorityLabel.textContent = getPriorityText(priorityNum);
     }
     
@@ -341,7 +355,8 @@ function renderTickets(tickets) {
         statusEl.className += ' ' + getStatusColor(ticket.status);
         
         // Priority
-        clone.querySelector('.ticket-priority').innerHTML = getPriorityIcon(ticket.priority);
+        clone.querySelector('.ticket-priority').appendChild(getPriorityIcon(ticket.priority));
+        //addPriorityButtonsToMenu(clone.querySelector('.priority-menu'), )
         
         container.appendChild(clone);
     });
@@ -432,7 +447,12 @@ function showTicketSidebar(ticketId) {
     statusEl.className = 'text-xs px-2 py-1 rounded-full cursor-pointer hover:opacity-70 ' + getStatusColor(ticket.status);
     
     // Priority
-    document.getElementById('sidebar-priority').innerHTML = getPriorityIcon(ticket.priority) + `<span>${getPriorityText(ticket.priority)}</span>`;
+    const sidebarPriority = document.getElementById('sidebar-priority');
+    sidebarPriority.innerHTML = ""; // Clear existing content
+    sidebarPriority.appendChild(getPriorityIcon(ticket.priority));
+    const span = document.createElement('span');
+    span.textContent = getPriorityText(ticket.priority);
+    sidebarPriority.appendChild(span);
     
     // Created date
     document.getElementById('sidebar-created').textContent = ticket.created_at 
@@ -453,4 +473,23 @@ function closeSidebar() {
     const sidebar = document.getElementById('ticket-sidebar');
     sidebar.classList.remove('w-80', 'p-4');
     sidebar.classList.add('w-0');
+}
+
+function addPriorityButtonsToMenu(menu, onclickAction, isFilter) {
+    let startIdx = isFilter ? 0 : 1;
+
+    for(let idx = startIdx; idx < PRIORITIES.length; idx++) {
+        const priority = PRIORITIES[idx];
+        const priorityBtn = document.createElement('button');
+        priorityBtn.className = "w-full flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 text-sm";
+        priorityBtn.onclick = function() { onclickAction(priority.id); };
+
+        const img = getPriorityIcon(idx);
+
+        priorityBtn.appendChild(img);
+        const textNode = document.createTextNode(priority.name);
+        priorityBtn.appendChild(textNode);
+
+        menu.appendChild(priorityBtn);
+    }
 }
