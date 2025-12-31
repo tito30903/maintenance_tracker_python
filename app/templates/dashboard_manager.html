@@ -130,6 +130,23 @@
                 <label class="text-xs text-gray-500 uppercase tracking-wide">Created at</label>
                 <p id="sidebar-created" class="text-gray-600 text-sm mt-1"></p>
             </div>
+
+             <!-- Documentation with pictures -->
+            <div class="pt-2 border-t border-gray-100">
+                <label class="text-xs text-gray-500 uppercase tracking-wide flex justify-between items-center">
+                    Pictures
+                    <button onclick="document.getElementById('file-upload').click()" class="text-blue-600 hover:text-blue-800 font-bold normal-case text-lg">+</button>
+                </label>
+
+                <div id="sidebar-attachments" class="mt-2 grid grid-cols-3 gap-2">
+                    <label for="file-upload" class="flex items-center justify-center aspect-square border-2 border-dashed border-gray-300 rounded cursor-pointer hover:bg-gray-50 transition-colors">
+                        <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        <input id="file-upload" type="file" class="hidden" accept="image/*" multiple onchange="handleFileUpload(event)">
+                    </label>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -173,5 +190,5 @@
     </div>
 </template>
 
-<script src="/static/js/dashboard_manager.js"></script>
+<script src="/static/js/dashboard_manager_technician.js"></script>
 {% endblock %}

@@ -93,6 +93,46 @@ async function updateTicket(ticket) {
     }
 }
 
+async function loadPictures(ticketId){
+    try {
+        const response = await fetch(`/api/photos/${ticketId}`);
+        const data = await response.json();
+
+        if (data.success) {
+            ticketPictures = data.pictures;
+        }
+        ticketPictures.forEach(pic => {
+          addThumbnailToSidebar(pic.url);
+        });
+    } catch (error) {
+        console.error('Error loading pictures:', error);
+    }
+}
+
+async function handleFileUpload(event) {
+    const files = event.target.files;
+    const ticketId = currentSidebarTicketId;
+
+    for (let file of files) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const response = await fetch(`/api/photos/${ticketId}`, {
+                method: 'PUT',
+                body: formData
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                addThumbnailToSidebar(data.url);
+            }
+        } catch (error) {
+            console.error("Upload did not work:", error);
+        }
+    }
+}
+
 // ===================
 // Helper Functions
 // ===================
@@ -291,9 +331,11 @@ function setupShowTicketSidebarEventListener() {
         if (!card) return;
         
         const ticketId = card.dataset.ticketId;
-        
+        ticketPictures = [];
+        clearPictures();
         // Click on the card itself - show sidebar
         showTicketSidebar(ticketId);
+        loadPictures(ticketId);
     });
 }
 
@@ -531,3 +573,38 @@ function addStatusButtonsToMenu(menu, onclickAction, isFilter) {
     }
 }
 
+function addThumbnailToSidebar(imageUrl) {
+    const container = document.getElementById('sidebar-attachments');
+    const div = document.createElement('div');
+    div.className = "relative group aspect-square bg-gray-100 rounded overflow-hidden border border-gray-200";
+
+    div.innerHTML = `
+        <img src="${imageUrl}"
+             class="object-cover w-full h-full cursor-pointer hover:scale-110 transition-transform duration-200"
+             onclick="window.open('${imageUrl}', '_blank')"
+             alt="Ticket Anhang">
+
+        <button onclick="deleteAttachment(this, '${imageUrl}')"
+                class="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-700">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+    `;
+    const uploadButton = container.querySelector('label[for="file-upload"]');
+    if (uploadButton) {
+        container.insertBefore(div, uploadButton);
+    } else {
+        container.appendChild(div);
+    }
+}
+
+function clearPictures() {
+    const container = document.getElementById('sidebar-attachments');
+
+    Array.from(container.children).forEach(child => {
+        if (child.tagName.toLowerCase() !== 'label') {
+          child.remove();
+        }
+    });
+}

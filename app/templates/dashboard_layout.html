@@ -14,9 +14,11 @@
         </p>
 
         <div class="ml-auto flex flex-row items-center gap-4 h-8">
+            {% block header_actions %}
             <button class="h-full" onclick="addTicket()">
                 <img src="/static/images/plus.png" alt="plus" class="h-5 w-5 object-contain">
             </button>
+            {% endblock %}
             <div class="relative h-full">
                 <button class="h-full" onclick="toggleProfileOptions()">
                     <img src="/static/images/profile.png" alt="profile" class="h-7 w-7 object-contain">

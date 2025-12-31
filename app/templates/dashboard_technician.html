@@ -1,5 +1,198 @@
 {% extends 'dashboard_layout.html' %}
 
+{% block header_actions %}
+    {# leer = Plus verschwindet #}
+{% endblock %}
+
 {% block content %}
-TECHNICIAN DASHBOARD
+<div class="flex flex-1">
+    <!-- Main content -->
+    <div class="flex-1 p-4 transition-all duration-300" id="main-content">
+        <section>
+            <h2 class="text-xl font-bold mb-4">Technician Dashboard</h2>
+
+            <!-- Filter section -->
+            <div class="flex flex-wrap gap-4 mb-6">
+                <div class="relative" hidden="hidden">
+                    <button id="filter-technician-btn" onclick="toggleFilterTechnicianMenu(event)" class="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                        <img src="/static/images/person.svg" class="w-4 h-4" alt="Person" />
+                        <span id="filter-technician-label" class="text-sm">All Technicians</span>
+                        <img src="/static/images/chevron.svg" class="w-4 h-4" alt="Chevron" />
+                    </button>
+                    <div id="filter-technician-menu" class="absolute left-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[180px] z-50 hidden">
+                        <!-- added automatically here in JS see initFilters -->
+                    </div>
+                </div>
+
+                <!-- Status filter -->
+                <div class="relative">
+                    <button id="filter-status-btn" onclick="toggleFilterStatusMenu(event)" class="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                        <span id="filter-status-dot" class="w-2 h-2 rounded-full bg-gray-400"></span>
+                        <span id="filter-status-label" class="text-sm">All Statuses</span>
+                        <img src="/static/images/chevron.svg" class="w-4 h-4" alt="Chevron" />
+                    </button>
+                    <div id="filter-status-menu" class="absolute left-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[150px] z-50 hidden">
+                        <!-- added automatically here in JS see initFilters -->
+                    </div>
+                </div>
+
+                <!-- Priority filter -->
+                <div class="relative">
+                    <button id="filter-priority-btn" onclick="toggleFilterPriorityMenu(event)" class="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                        <span id="filter-priority-icon" class="w-4 h-4 text-gray-400">
+                            <svg stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 10h16"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 14h16"></path>
+                            </svg>
+                        </span>
+                        <span id="filter-priority-label" class="text-sm">All Priorities</span>
+                        <img src="/static/images/chevron.svg" class="w-4 h-4" alt="Chevron" />
+
+                    </button>
+                    <div id="filter-priority-menu" class="absolute left-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[150px] z-50 hidden">
+                        <!-- added automatically here in JS see initFilters -->
+                    </div>
+                </div>
+
+                <!-- Clear filters button (shown if filter is active) -->
+                <button id="clear-filters-btn" class="hidden px-3 py-2 text-sm text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg" onclick="clearFilters()">
+                    Clear filters
+                </button>
+            </div>
+        </section>
+
+
+        <!-- Tickets container -->
+        <section id="tickets-container" class="grid gap-4">
+            <!-- Tickets will be loaded here -->
+        </section>
+    </div>
+
+    <!-- Ticket detail sidebar (hidden by default) -->
+    <div id="ticket-sidebar" class="w-0 pt-4 overflow-hidden transition-all duration-300 border-l border-gray-200 bg-white">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-bold">Ticket Details</h3>
+            <button onclick="closeSidebar()" class="text-gray-500 hover:text-gray-700">
+                <svg class="w-5 h-5" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+
+        <div class="space-y-4">
+            <!-- Name -->
+            <div contenteditable="false">
+                <label class="text-xs text-gray-500 uppercase tracking-wide">Name</label>
+                <input id="sidebar-name" type="text" class="w-full mt-1 px-2 py-1 border border-gray-300 rounded font-medium text-gray-900 focus:outline-none focus:ring-1 focus:ring-blue-500">
+            </div>
+
+            <!-- Description -->
+            <div>
+                <label class="text-xs text-gray-500 uppercase tracking-wide">Description</label>
+                <textarea id="sidebar-description" rows="3" class="w-full mt-1 px-2 py-1 border border-gray-300 rounded text-gray-700 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"></textarea>
+            </div>
+
+            <!-- Status -->
+            <div>
+                <label class="text-xs text-gray-500 uppercase tracking-wide">Status</label>
+                <div class="relative mt-1">
+                    <button id="sidebar-status" onclick="toggleSidebarStatusMenu(event)" class="text-xs px-2 py-1 rounded-full cursor-pointer hover:opacity-70"></button>
+                    <div id="sidebar-status-menu" class="absolute left-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[120px] z-50 hidden">
+                        <!-- automatically added in JS when sidebar is shown -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Priority -->
+            <div class="pointer-events-none select-none opacity-80">
+                <label class="text-xs text-gray-500 uppercase tracking-wide">Priority</label>
+                <div class="relative mt-1">
+                    <button id="sidebar-priority" onclick="toggleSidebarPriorityMenu(event)" class="flex items-center gap-2 cursor-pointer hover:opacity-70"></button>
+                    <div id="sidebar-priority-menu" class="absolute left-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[120px] z-50 hidden">
+                        <!-- automatically added in JS when sidebar is shown -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Assignee -->
+            <div class="pointer-events-none select-none opacity-80">
+                <label class="text-xs text-gray-500 uppercase tracking-wide">Assignee</label>
+                <div class="relative mt-1">
+                    <button id="sidebar-assignee" onclick="toggleSidebarAssigneeMenu(event)" class="flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700 cursor-pointer hover:opacity-70">
+                        <img src="/static/images/person.svg" class="w-4 h-4" alt="Person" />
+                        <span id="sidebar-assignee-name">Unassigned</span>
+                    </button>
+                    <div id="sidebar-assignee-menu" class="absolute left-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[150px] z-50 hidden">
+                        <!-- added automatically via JS when sidebar is shown --->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Created at -->
+            <div class="pointer-events-none select-none opacity-80">
+                <label class="text-xs text-gray-500 uppercase tracking-wide">Created at</label>
+                <p id="sidebar-created" class="text-gray-600 text-sm mt-1"></p>
+            </div>
+
+
+            <!-- Documentation with pictures -->
+            <div class="pt-2 border-t border-gray-100">
+                <label class="text-xs text-gray-500 uppercase tracking-wide flex justify-between items-center">
+                    Pictures
+                    <button onclick="document.getElementById('file-upload').click()" class="text-blue-600 hover:text-blue-800 font-bold normal-case text-lg">+</button>
+                </label>
+
+                <div id="sidebar-attachments" class="mt-2 grid grid-cols-3 gap-2">
+                    <label for="file-upload" class="flex items-center justify-center aspect-square border-2 border-dashed border-gray-300 rounded cursor-pointer hover:bg-gray-50 transition-colors">
+                        <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        <input id="file-upload" type="file" class="hidden" accept="image/*" multiple onchange="handleFileUpload(event)">
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ticket card template -->
+<template id="ticket-template">
+    <div class="ticket-card border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+        <div class="flex justify-between items-center">
+            <h3 class="ticket-name font-semibold text-lg"></h3>
+            <div class="flex items-center gap-2">
+                <!-- Technician assignment -->
+                <div class="relative flex items-center">
+                    <button onclick="toggleTicketAssigneeMenu(event)" class="cursor-pointer hover:opacity-70 flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">
+                        <img src="/static/images/person.svg" class="w-4 h-4" alt="Person" />
+                        <span class="assignee-name">Unassigned</span>
+                    </button>
+                    <!-- Assignment dropdown -->
+                    <div class="assignee-menu absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[150px] z-50 hidden">
+                        <!-- added automatically via JS, see render tickets -->
+                    </div>
+                </div>
+
+                <!-- Priority -->
+                <div class="relative flex items-center">
+                    <button onclick="toggleTicketPriorityMenu(event)" class="ticket-priority cursor-pointer hover:opacity-70 flex items-center justify-center w-6 h-6"></button>
+                    <!-- Priority dropdown -->
+                    <div class="priority-menu absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[120px] z-50 hidden">
+                        <!-- added automatically via JS -->
+                    </div>
+                </div>
+                <!-- Status -->
+                <div class="relative flex items-center">
+                    <button onclick="toggleTicketStatusMenu(event)" class="ticket-status text-xs px-2 py-1 rounded-full cursor-pointer hover:opacity-70"></button>
+                    <!-- Status dropdown -->
+                    <div class="status-menu absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[120px] z-50 hidden">
+                        <!-- added automatically via JS when ticket is rendered -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script src="/static/js/dashboard_manager_technician.js"></script>
 {% endblock %}

@@ -3,6 +3,9 @@ from datetime import datetime
 from .models import UserRoles
 from .supabase_client import supabase
 
+from flask import jsonify
+import os
+
 # TOKEN VALIDATION / LOGIN / REGISTRATION
 # return enum for which page token is valid
 def validate_token(token: str) -> tuple[UserRoles, str] | None:
@@ -64,6 +67,47 @@ def update_ticket(ticket: dict) -> bool:
         return True
     except Exception:
         return False
+
+
+def upload_attachment(ticket_id, file):
+    file_extension = os.path.splitext(file.filename)[1]
+    file_path = f"{ticket_id}/{os.urandom(4).hex()}{file_extension}"
+
+    try:
+        file.seek(0)
+        file_content = file.read()
+        supabase.storage.from_('photo_bucket').upload(
+            file_path,
+            file_content,
+            {"content-type": file.content_type}
+        )
+
+        file_url = supabase.storage.from_('photo_bucket').get_public_url(file_path)
+
+        supabase.table('ticket_photos').insert({
+            "ticket_id": ticket_id,
+            "url": file_url,
+            "file_path": file_path
+        }).execute()
+
+        return jsonify({"url": file_url}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+def get_pictures(ticket_id):
+    response = (
+        supabase
+        .table("ticket_photos")
+        .select("id, url, file_path, created_at")
+        .eq("ticket_id", ticket_id)
+        .order("created_at", desc=True)
+        .execute()
+    )
+
+    return response.data
+
 
 # USER MANAGEMENT
 def get_users() -> list[dict]:

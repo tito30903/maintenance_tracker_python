@@ -97,6 +97,30 @@ def unauthorized():
 def about():
     return "This is a Flask project template!"
 
+@main.route(API_PHOTOS, methods=['PUT'])
+@authorized
+def put_photos(ticket_id: str):
+
+    if not ticket_id:
+        return jsonify({"error": "Ticket ID fehlt"}), 400
+
+    if 'file' not in request.files:
+        return jsonify({"error": "No file"}), 400
+
+    file = request.files['file']
+    ret = db.upload_attachment(ticket_id, file)
+
+    return ret
+
+@main.route(API_PHOTOS, methods=['GET'])
+@authorized
+def get_photos(ticket_id: str):
+    if not ticket_id:
+        return jsonify({"error": "Ticket ID fehlt"}), 400
+    return jsonify({"success": True, "pictures": db.get_pictures(ticket_id)})
+
+
+
 # DEBUG ROUTES
 @main.route(DEBUG_URL + DEBUG_DUMP_USERS_URL, methods=['GET'])
 def dump_users():

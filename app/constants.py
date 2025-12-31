@@ -10,6 +10,7 @@ UNAUTHORIZED = "/unauthorized"
 API_PREFIX = "/api"
 API_TICKETS = API_PREFIX + "/tickets"
 API_USERS = API_PREFIX + "/users"
+API_PHOTOS = API_PREFIX + "/photos/<ticket_id>"
 
 
 # DEBUG PATHS
