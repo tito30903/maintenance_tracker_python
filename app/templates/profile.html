@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Profile{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
+</head>
+<body>
+<div class="flex justify-center items-center w-screen h-screen bg-gray-100">
+
+{% block content %}
+<div class="bg-white shadow-lg rounded-xl w-full max-w-md p-8">
+
+    <h1 class="text-2xl font-semibold text-center mb-6 text-gray-800">
+        Change profile
+    </h1>
+
+    <form method="POST"
+          action="history.back()"
+          class="space-y-5"
+          onsubmit="return validatePasswords()">
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+            <input type="text" name="name"
+                   value="{{ user.name if user else '' }}"
+                   class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                   required>
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">E-Mail</label>
+            <input type="email" name="email"
+                   value="{{ user.email if user else '' }}"
+                   class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                   required>
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+                New password
+            </label>
+            <input type="password" id="password"
+                   name="password"
+                   class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                   placeholder="New password">
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+                Confirm password
+            </label>
+            <input type="password" id="password_confirm"
+                   class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                   placeholder="Repeat password">
+            <p id="password_error"
+               class="text-xs text-red-500 mt-1 hidden">
+                Passwords are not equal
+            </p>
+        </div>
+
+        <div class="flex gap-3 pt-4">
+            <button type="button"
+                onclick="history.back()"
+                class="w-1/2 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 rounded-lg font-medium transition">
+                Cancel
+            </button>
+
+            <button type="button" onclick="saveProfile()"
+                    class="w-1/2 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium transition">
+                Safe
+            </button>
+        </div>
+
+    </form>
+
+</div>
+{% endblock %}
+
+</div>
+
+<script src="/static/js/profile.js"></script>
+
+</body>
+</html>

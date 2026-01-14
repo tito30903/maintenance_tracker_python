@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, jsonify, Response
+from flask import Blueprint, render_template, request, jsonify, Response, redirect, url_for, session
 
 from . import db
 from .auth_decorator import authorized
@@ -38,6 +38,10 @@ def register():
         # Insert into Supabase
         return db.register_user(username, email, password)
     return render_template('register.html')
+
+@main.route(PROFILE_URL)
+def profile_page():
+    return render_template("profile.html")
 
 # DASHBOARD ROUTES
 @main.route(DASHBOARD_MANAGER_URL, methods=['GET'])
@@ -118,6 +122,50 @@ def get_photos(ticket_id: str):
     if not ticket_id:
         return jsonify({"error": "Ticket ID fehlt"}), 400
     return jsonify({"success": True, "pictures": db.get_pictures(ticket_id)})
+
+@main.route(API_PROFILE, methods=['GET', 'POST'])
+def api_profile():
+    auth = request.headers.get("Authorization")
+
+    if not auth or not auth.startswith("Bearer "):
+        return {"error": "unauthorized"}, 401
+
+    token = auth.replace("Bearer ", "")
+
+    if request.method == "GET":
+        user = db.get_user_info(token)
+        if not user:
+            return {"error": "not found"}, 404
+
+        return {
+            "name": user["name"],
+            "email": user["email"]
+        }
+
+    if request.method == "POST":
+        data = request.get_json()
+
+        if not data:
+            return {"error": "no data provided"}, 400
+
+        name = data.get("name")
+        email = data.get("email")
+        password = data.get("password")
+
+        if not name or not email:
+            return {"error": "name and email required"}, 400
+
+        success = db.update_user(
+            token=token,
+            name=name,
+            email=email,
+            password=password
+        )
+
+        if not success:
+            return {"error": "update failed"}, 500
+
+        return {"success": True}
 
 
 

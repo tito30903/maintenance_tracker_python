@@ -116,6 +116,26 @@ def get_users() -> list[dict]:
 def get_users_by_role(role: UserRoles):
     return supabase.table('users').select('id, email, name, role').eq('role', role.value).execute().data
 
+def get_user_info(token: str):
+    try:
+        res = (supabase.table("users").select("email, name").eq("token", token).single().execute())
+        return res.data
+    except Exception as e:
+        print("get_user_info failed:", e)
+        return None
+
+
+def update_user(token: str, email: str, name: str, password: str) -> bool:
+    try:
+        if password is None:
+            supabase.table('users').update({"name": name, "email": email}).eq("token",token).execute()
+        else:
+            supabase.table('users').update({"name": name, "email": email, "password": password}).eq("token", token).execute()
+        return True
+    except Exception:
+        return False
+
+
 # this is only used for debugging purposes - includes sensitive info like password and token
 def _get_users() -> list[dict]:
     return supabase.table('users').select('*').execute().data
