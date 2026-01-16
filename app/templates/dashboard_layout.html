@@ -2,8 +2,37 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flask App</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
+    <style>
+    @media (max-width: 767px) {
+        #ticket-sidebar {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+
+        width: 100% !important;     /* überschreibt w-0/w-80 */
+        max-height: 85vh;
+        overflow-y: auto !important;
+        overflow-x: hidden;
+
+        background: #fff;
+        border-left: none !important;
+        border-top: 1px solid rgb(229 231 235) !important;
+        border-radius: 16px 16px 0 0;
+
+        transform: translateY(100%);
+        transition: transform 300ms ease;
+        z-index: 50;
+        }
+
+        #ticket-sidebar.mobile-open {
+        transform: translateY(0);
+        }
+  }
+</style>
 </head>
 <body class="min-h-screen flex flex-col">
     <!-- header bar -->
@@ -14,11 +43,18 @@
         </p>
 
         <div class="ml-auto flex flex-row items-center gap-4 h-8">
-            {% block header_actions %}
-            <button class="h-full" onclick="addTicket()">
-                <img src="/static/images/plus.png" alt="plus" class="h-5 w-5 object-contain">
-            </button>
-            {% endblock %}
+            {% if not hide_header_actions %}
+                <a href="/history"
+                class="h-full px-3 rounded-lg border border-gray-300 text-sm flex items-center hover:bg-gray-50">
+                History
+                </a>
+
+                {% block header_actions %}
+                <button class="h-full" onclick="addTicket()">
+                    <img src="/static/images/plus.png" alt="plus" class="h-5 w-5 object-contain">
+                </button>
+                {% endblock %}
+            {% endif %}
             <div class="relative h-full">
                 <button class="h-full" onclick="toggleProfileOptions()">
                     <img src="/static/images/profile.png" alt="profile" class="h-7 w-7 object-contain">

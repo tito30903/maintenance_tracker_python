@@ -64,7 +64,7 @@
             <!-- Tickets will be loaded here -->
         </section>
     </div>
-    
+
     <!-- Ticket detail sidebar (hidden by default) -->
     <div id="ticket-sidebar" class="w-0 pt-4 overflow-hidden transition-all duration-300 border-l border-gray-200 bg-white">
         <div class="flex justify-between items-center mb-4">
@@ -129,6 +129,18 @@
             <div>
                 <label class="text-xs text-gray-500 uppercase tracking-wide">Created at</label>
                 <p id="sidebar-created" class="text-gray-600 text-sm mt-1"></p>
+            </div>
+            <!-- Update + Save -->
+            <div>
+              <label class="text-xs text-gray-500 uppercase tracking-wide">Update</label>
+              <textarea id="sidebar-update-message"
+                            rows="3"
+                            placeholder="Write an update..."
+                            class="w-full mt-1 px-2 py-1 border border-gray-300 rounded text-gray-700 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"></textarea>
+
+              <button id="sidebar-save-btn" onclick="saveSidebarChanges()" class="mt-2 w-full px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
+                    Save
+              </button>
             </div>
 
              <!-- Documentation with pictures -->

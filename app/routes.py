@@ -181,3 +181,60 @@ def dump_tickets():
     tickets = db.get_tickets(None)
     print(tickets)
     return tickets
+
+@main.route('/history', methods=['GET'])
+def history_page():
+    return render_template('history_log.html', hide_header_actions=True)
+
+@main.route(API_TICKETS + '/save_update', methods=['POST'])
+@authorized
+def save_ticket_update(user_id: str):
+    ticket_id = request.form.get("ticket_id")
+    if not ticket_id:
+        return jsonify({"success": False, "message": "ticket_id missing"}), 400
+
+    name = request.form.get("name")
+    description = request.form.get("description")
+    message = request.form.get("message") or ""
+
+    status_raw = request.form.get("status")
+    priority_raw = request.form.get("priority")
+    assigned_to_raw = request.form.get("assigned_to")
+
+    updates = {"id": ticket_id}
+
+    if name is not None:
+        updates["name"] = name
+    if description is not None:
+        updates["description"] = description
+
+    if status_raw is not None and status_raw != "":
+        updates["status"] = int(status_raw)
+    if priority_raw is not None and priority_raw != "":
+        updates["priority"] = int(priority_raw)
+    if assigned_to_raw == "":
+        updates["assigned_to"] = None
+    elif assigned_to_raw is not None:
+        updates["assigned_to"] = assigned_to_raw
+
+    files = request.files.getlist("files")
+
+    try:
+        result = db.save_ticket_update_with_log(
+            ticket_id=ticket_id,
+            actor_user_id=user_id,
+            updates=updates,
+            note_text=message,
+            files=files
+        )
+        return jsonify({"success": True, "log": result["log"], "uploaded": result["uploaded"]})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+@main.route(API_TICKETS + '/history', methods=['GET'])
+@authorized
+def get_history(role: UserRoles, user_id: str):
+    q = request.args.get("q")
+    rows = db.get_ticket_history(search=q)
+    return jsonify({"success": True, "entries": rows})
+

@@ -2,11 +2,16 @@
 let techniciansCache = [];
 let ticketsCache = [];
 let currentSidebarTicketId = null;
+let sidebarDraft = null;         
+let sidebarStagedFiles = [];     
+
 let filters = {
     technician: '',
     status: '',
     priority: ''
 };
+
+let picturesLoadToken = 0;
 
 // Constants
 const STATUSES = [
@@ -93,45 +98,50 @@ async function updateTicket(ticket) {
     }
 }
 
-async function loadPictures(ticketId){
-    try {
-        const response = await fetch(`/api/photos/${ticketId}`);
-        const data = await response.json();
+async function loadPictures(ticketId) {
+  const container = document.getElementById('sidebar-attachments');
+  if (!container || !ticketId) return;
 
-        if (data.success) {
-            ticketPictures = data.pictures;
-        }
-        ticketPictures.forEach(pic => {
-          addThumbnailToSidebar(pic.url);
-        });
-    } catch (error) {
-        console.error('Error loading pictures:', error);
+  const token = ++picturesLoadToken;
+
+  clearPictures();
+
+  try {
+    const response = await fetch(`/api/photos/${ticketId}`);
+    const data = await response.json();
+
+    if (token !== picturesLoadToken) return;
+    if (!data.success) return;
+
+    const pics = data.pictures || data.photos || [];
+
+    for (const pic of pics) {
+      const url = pic.url || pic;
+      addPictureThumbnail(url);
     }
+  } catch (error) {
+      console.error('Error loading pictures:', error);
+  }
 }
 
 async function handleFileUpload(event) {
-    const files = event.target.files;
-    const ticketId = currentSidebarTicketId;
+  if (!sidebarDraft) return;
 
-    for (let file of files) {
-        const formData = new FormData();
-        formData.append('file', file);
+  const files = Array.from(event.target.files || []);
+  if (files.length === 0) return;
 
-        try {
-            const response = await fetch(`/api/photos/${ticketId}`, {
-                method: 'PUT',
-                body: formData
-            });
+  for (const file of files) {
+    const url = URL.createObjectURL(file);
+    addPictureThumbnail(url);
+    setTimeout(() => URL.revokeObjectURL(url), 15000);
+  }
 
-            const data = await response.json();
-            if (response.ok) {
-                addThumbnailToSidebar(data.url);
-            }
-        } catch (error) {
-            console.error("Upload did not work:", error);
-        }
-    }
+  event.target.value = "";
+
+  await autoSaveSidebar({}, files, "Photos uploaded");
 }
+
+
 
 // ===================
 // Helper Functions
@@ -335,7 +345,6 @@ function setupShowTicketSidebarEventListener() {
         clearPictures();
         // Click on the card itself - show sidebar
         showTicketSidebar(ticketId);
-        loadPictures(ticketId);
     });
 }
 
@@ -407,85 +416,197 @@ function toggleSidebarAssigneeMenu(e) {
 }
 
 function setupSidebarEvents() {
-    // triggered if name or description fields lose focus
-    document.getElementById('sidebar-name').addEventListener('blur', (e) => {
-        if (currentSidebarTicketId) {
-            updateTicket({ id: currentSidebarTicketId, name: e.target.value });
-        }
-    });
+  const nameEl = document.getElementById('sidebar-name');
+  const descEl = document.getElementById('sidebar-description');
+  const msgEl = document.getElementById('sidebar-update-message');
 
-    document.getElementById('sidebar-description').addEventListener('blur', (e) => {
-        if (currentSidebarTicketId) {
-            updateTicket({ id: currentSidebarTicketId, description: e.target.value });
-        }
+  if (nameEl) {
+    nameEl.addEventListener('input', (e) => {
+      if (!sidebarDraft) return;
+      sidebarDraft.values.name = e.target.value;
+      updateSaveButtonState();
     });
+  }
+
+  if (descEl) {
+    descEl.addEventListener('input', (e) => {
+      if (!sidebarDraft) return;
+      sidebarDraft.values.description = e.target.value;
+      updateSaveButtonState();
+    });
+  }
+
+  if (msgEl) {
+    msgEl.addEventListener('input', (e) => {
+      if (!sidebarDraft) return;
+      sidebarDraft.values.message = e.target.value;
+      updateSaveButtonState();
+    });
+  }
+
+  // Save button exists on both pages after you added it
+  const saveBtn = document.getElementById('sidebar-save-btn');
+  if (saveBtn) {
+    updateSaveButtonState();
+  }
 }
 
 function showTicketSidebar(ticketId) {
-    const ticket = ticketsCache.find(t => t.id === ticketId);
-    if (!ticket) return;
-    
-    currentSidebarTicketId = ticketId;
-    
-    // Name & Description
-    document.getElementById('sidebar-name').value = ticket.name || '';
-    document.getElementById('sidebar-description').value = ticket.description || '';
-    
-    // Assignee
-    document.getElementById('sidebar-assignee-name').textContent = getTechnicianName(ticket.assigned_to);
-    
-    // Populate assignee dropdown
-    const assigneeMenu = document.getElementById('sidebar-assignee-menu');
-    assigneeMenu.innerHTML = ''; // Clear existing content
-    addAssigneeButtonsToMenu(assigneeMenu, (assigneeId) => updateTicket({id: currentSidebarTicketId, assigned_to: assigneeId}), false);
-    
-    // Status
-    const statusEl = document.getElementById('sidebar-status');
-    statusEl.textContent = getStatusText(ticket.status);
-    statusEl.className = 'text-xs px-2 py-1 rounded-full cursor-pointer hover:opacity-70 ' + getStatusColor(ticket.status);
+  const ticket = ticketsCache.find(t => t.id === ticketId);
+  if (!ticket) return;
 
-    // Populate status dropdown
-    const statusMenu = document.getElementById('sidebar-status-menu');
-    statusMenu.innerHTML = ''; // Clear existing content
-    addStatusButtonsToMenu(statusMenu, (status) => updateTicket({id: currentSidebarTicketId, status: status}), false);
-    
-    // Priority
-    const sidebarPriority = document.getElementById('sidebar-priority');
-    sidebarPriority.innerHTML = ""; // Clear existing content
-    sidebarPriority.appendChild(getPriorityIcon(ticket.priority));
-    const span = document.createElement('span');
-    span.textContent = getPriorityText(ticket.priority);
-    sidebarPriority.appendChild(span);
+  currentSidebarTicketId = ticketId;
 
-    // priority dropdown
-    const priorityMenu = document.getElementById('sidebar-priority-menu');
-    priorityMenu.innerHTML = ''; // Clear existing content
-    addPriorityButtonsToMenu(priorityMenu, (priority) => {
-        if (currentSidebarTicketId) {
-            updateTicket({ id: currentSidebarTicketId, priority: parseInt(priority) });
-        }
+  // init draft
+  sidebarDraft = {
+    ticketId,
+    original: {
+      name: ticket.name || "",
+      description: ticket.description || "",
+      status: ticket.status,
+      priority: ticket.priority,
+      assigned_to: ticket.assigned_to || null
+    },
+    values: {
+      name: ticket.name || "",
+      description: ticket.description || "",
+      status: ticket.status,
+      priority: ticket.priority,
+      assigned_to: ticket.assigned_to || null,
+      message: ""
+    }
+  };
+
+  // reset staged files
+  sidebarStagedFiles.forEach(x => URL.revokeObjectURL(x.url));
+  sidebarStagedFiles = [];
+  clearPictures(); // clears thumbnails (except upload label)
+  loadPictures(ticketId); // reload existing pictures from server (your old endpoint)
+
+  // Name & Description
+  document.getElementById('sidebar-name').value = sidebarDraft.values.name;
+  document.getElementById('sidebar-description').value = sidebarDraft.values.description;
+
+  // Assignee label
+  document.getElementById('sidebar-assignee-name').textContent = getTechnicianName(sidebarDraft.values.assigned_to);
+
+  // Populate assignee dropdown (changes draft only)
+  const assigneeMenu = document.getElementById('sidebar-assignee-menu');
+  assigneeMenu.innerHTML = '';
+  addAssigneeButtonsToMenu(assigneeMenu, async (assigneeId) => {
+    sidebarDraft.values.assigned_to = assigneeId;
+    document.getElementById('sidebar-assignee-name').textContent = getTechnicianName(assigneeId);
+    updateSaveButtonState();
+
+    await autoSaveSidebar({ assigned_to: assigneeId }, [], "");
     }, false);
-    
-    // Created date
-    document.getElementById('sidebar-created').textContent = ticket.created_at 
-        ? new Date(ticket.created_at).toLocaleString() 
-        : 'Unknown';
 
-    showSidebar();
+
+  // Status UI
+  const statusEl = document.getElementById('sidebar-status');
+  statusEl.textContent = getStatusText(sidebarDraft.values.status);
+  statusEl.className = 'text-xs px-2 py-1 rounded-full cursor-pointer hover:opacity-70 ' + getStatusColor(sidebarDraft.values.status);
+
+  // Populate status dropdown (draft only)
+  const statusMenu = document.getElementById('sidebar-status-menu');
+  statusMenu.innerHTML = '';
+  addStatusButtonsToMenu(statusMenu, async (status) => {
+    sidebarDraft.values.status = status;
+    statusEl.textContent = getStatusText(status);
+    statusEl.className = 'text-xs px-2 py-1 rounded-full cursor-pointer hover:opacity-70 ' + getStatusColor(status);
+    updateSaveButtonState();
+
+    await autoSaveSidebar({ status }, [], "");
+    }, false);
+
+
+  // Priority UI
+  const sidebarPriority = document.getElementById('sidebar-priority');
+  sidebarPriority.innerHTML = "";
+  sidebarPriority.appendChild(getPriorityIcon(sidebarDraft.values.priority));
+  const span = document.createElement('span');
+  span.textContent = getPriorityText(sidebarDraft.values.priority);
+  sidebarPriority.appendChild(span);
+
+  // Priority dropdown (draft only)
+  const priorityMenu = document.getElementById('sidebar-priority-menu');
+  priorityMenu.innerHTML = '';
+  addPriorityButtonsToMenu(priorityMenu, async (priority) => {
+    sidebarDraft.values.priority = parseInt(priority);
+    sidebarPriority.innerHTML = "";
+    sidebarPriority.appendChild(getPriorityIcon(sidebarDraft.values.priority));
+    const sp = document.createElement('span');
+    sp.textContent = getPriorityText(sidebarDraft.values.priority);
+    sidebarPriority.appendChild(sp);
+    updateSaveButtonState();
+
+    await autoSaveSidebar({ priority: sidebarDraft.values.priority }, [], "");
+    }, false);
+
+
+  // Created date
+  document.getElementById('sidebar-created').textContent = ticket.created_at
+    ? new Date(ticket.created_at).toLocaleString()
+    : 'Unknown';
+
+  // Update textbox (exists after you added it)
+  const msgEl = document.getElementById('sidebar-update-message');
+  if (msgEl) msgEl.value = "";
+
+  updateSaveButtonState();
+  showSidebar();
+}
+
+
+function isMobile() {
+  return window.matchMedia("(max-width: 767px)").matches;
 }
 
 function showSidebar() {
-    const sidebar = document.getElementById('ticket-sidebar');
+  const sidebar = document.getElementById('ticket-sidebar');
+  const backdrop = document.getElementById('sidebar-backdrop');
+
+  if (isMobile()) {
+    // Mobile: Bottom-sheet
+    sidebar.classList.add('mobile-open', 'p-4');
+    if (backdrop) backdrop.classList.remove('hidden');
+    document.body.classList.add('overflow-hidden');
+  } else {
+    // Desktop: exakt wie vorher (seitlich)
     sidebar.classList.remove('w-0');
     sidebar.classList.add('w-80', 'p-4');
+
+    if (backdrop) backdrop.classList.add('hidden');
+    document.body.classList.remove('overflow-hidden');
+  }
 }
 
 function closeSidebar() {
-    currentSidebarTicketId = null;
-    const sidebar = document.getElementById('ticket-sidebar');
+  currentSidebarTicketId = null;
+
+  const sidebar = document.getElementById('ticket-sidebar');
+  const backdrop = document.getElementById('sidebar-backdrop');
+
+  if (isMobile()) {
+    // Mobile close
+    sidebar.classList.remove('mobile-open');
+    if (backdrop) backdrop.classList.add('hidden');
+    document.body.classList.remove('overflow-hidden');
+
+    // optional: padding weg, wenn geschlossen
+    sidebar.classList.remove('p-4');
+  } else {
+    // Desktop close: exakt wie vorher
     sidebar.classList.remove('w-80', 'p-4');
     sidebar.classList.add('w-0');
+  }
 }
+
+// optional: if user rotates phone / resizes window while open
+window.addEventListener('resize', () => {
+  if (currentSidebarTicketId) showSidebar();
+});
+
 
 function addPriorityButtonsToMenu(menu, onclickAction, isFilter) {
     let startIdx = isFilter ? 0 : 1;
@@ -600,11 +721,194 @@ function addThumbnailToSidebar(imageUrl) {
 }
 
 function clearPictures() {
-    const container = document.getElementById('sidebar-attachments');
+  const container = document.getElementById('sidebar-attachments');
+  if (!container) return;
 
-    Array.from(container.children).forEach(child => {
-        if (child.tagName.toLowerCase() !== 'label') {
-          child.remove();
-        }
+  const uploadLabel = container.querySelector('label[for="file-upload"]');
+  container.innerHTML = "";
+  if (uploadLabel) container.appendChild(uploadLabel);
+}
+
+
+function addStagedThumbnailToSidebar(stagedId, imageUrl) {
+  const container = document.getElementById('sidebar-attachments');
+  const div = document.createElement('div');
+  div.className = "relative group aspect-square bg-gray-100 rounded overflow-hidden border border-gray-200";
+  div.dataset.stagedId = stagedId;
+
+  div.innerHTML = `
+    <img src="${imageUrl}"
+         class="object-cover w-full h-full cursor-pointer hover:scale-110 transition-transform duration-200"
+         alt="Staged Attachment">
+
+    <button onclick="removeStagedAttachment('${stagedId}')"
+            class="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-700">
+      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+    </button>
+  `;
+
+  const uploadButton = container.querySelector('label[for="file-upload"]');
+  if (uploadButton) container.insertBefore(div, uploadButton);
+  else container.appendChild(div);
+}
+
+function removeStagedAttachment(stagedId) {
+  const idx = sidebarStagedFiles.findIndex(x => x.id === stagedId);
+  if (idx >= 0) {
+    URL.revokeObjectURL(sidebarStagedFiles[idx].url);
+    sidebarStagedFiles.splice(idx, 1);
+  }
+
+  const container = document.getElementById('sidebar-attachments');
+  const el = container.querySelector(`[data-staged-id="${stagedId}"]`);
+  if (el) el.remove();
+
+  updateSaveButtonState();
+}
+
+function hasDraftChanges() {
+  if (!sidebarDraft) return false;
+  const o = sidebarDraft.original;
+  const v = sidebarDraft.values;
+
+  const changed =
+    (o.name !== v.name) ||
+    (o.description !== v.description) ||
+    (o.status !== v.status) ||
+    (o.priority !== v.priority) ||
+    ((o.assigned_to || null) !== (v.assigned_to || null));
+
+  const hasMsg = (v.message || "").trim().length > 0;
+  const hasFiles = sidebarStagedFiles.length > 0;
+
+  return changed || hasMsg || hasFiles;
+}
+
+function updateSaveButtonState() {
+  const btn = document.getElementById('sidebar-save-btn');
+  if (!btn) return;
+  btn.disabled = !hasDraftChanges();
+}
+
+// --- Auto-save (creates history log immediately) ---
+let sidebarAutoSaveInFlight = false;
+let sidebarAutoSaveQueued = null;
+
+async function autoSaveSidebar({ status, priority, assigned_to } = {}, files = [], note = "") {
+  if (!sidebarDraft) return;
+
+  const ticketId = sidebarDraft.ticketId;
+  const formData = new FormData();
+  formData.append("ticket_id", ticketId);
+
+  // only send fields that we want to save/log now
+  if (status !== undefined) formData.append("status", String(status));
+  if (priority !== undefined) formData.append("priority", String(priority));
+
+  // IMPORTANT: to unassign we must send "" (backend turns "" into None)
+  if (assigned_to !== undefined) formData.append("assigned_to", assigned_to ?? "");
+
+  // note text shown in history (optional)
+  formData.append("message", note ?? "");
+
+  for (const f of files) {
+    formData.append("files", f, f.name);
+  }
+
+  // simple queue so fast clicks don't lose changes
+  if (sidebarAutoSaveInFlight) {
+    sidebarAutoSaveQueued = { patch: { status, priority, assigned_to }, files, note };
+    return;
+  }
+
+  sidebarAutoSaveInFlight = true;
+  try {
+    const r = await fetch("/api/tickets/save_update", { method: "POST", body: formData });
+    const d = await r.json();
+
+    if (!r.ok || !d.success) {
+      console.error("AutoSave failed:", d);
+      return;
+    }
+
+    // refresh list + sidebar so draft/original stays in sync + photos reload
+    await loadTickets();
+    showTicketSidebar(ticketId);
+  } catch (e) {
+    console.error(e);
+  } finally {
+    sidebarAutoSaveInFlight = false;
+
+    if (sidebarAutoSaveQueued) {
+      const q = sidebarAutoSaveQueued;
+      sidebarAutoSaveQueued = null;
+      await autoSaveSidebar(q.patch, q.files, q.note);
+    }
+  }
+}
+
+
+async function saveSidebarChanges() {
+  if (!sidebarDraft) return;
+
+  const ticketId = sidebarDraft.ticketId;
+  const v = sidebarDraft.values;
+
+  const formData = new FormData();
+  formData.append("ticket_id", ticketId);
+  formData.append("name", v.name ?? "");
+  formData.append("description", v.description ?? "");
+  formData.append("status", String(v.status ?? ""));
+  formData.append("priority", String(v.priority ?? ""));
+  formData.append("assigned_to", v.assigned_to ?? "");
+  formData.append("message", v.message ?? "");
+
+  for (const sf of sidebarStagedFiles) {
+    formData.append("files", sf.file, sf.file.name);
+  }
+
+  try {
+    const r = await fetch("/api/tickets/save_update", {
+      method: "POST",
+      body: formData
     });
+
+    const d = await r.json();
+    if (!r.ok || !d.success) {
+      console.error("Save failed:", d);
+      return;
+    }
+
+    // reset draft message + staged
+    const msgEl = document.getElementById("sidebar-update-message");
+    if (msgEl) msgEl.value = "";
+
+    sidebarStagedFiles.forEach(x => URL.revokeObjectURL(x.url));
+    sidebarStagedFiles = [];
+
+    await loadTickets();          
+    showTicketSidebar(ticketId); 
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+function addPictureThumbnail(imageUrl) {
+  const container = document.getElementById('sidebar-attachments');
+  if (!container) return;
+
+  const div = document.createElement('div');
+  div.className = "relative group aspect-square bg-gray-100 rounded overflow-hidden border border-gray-200";
+
+  div.innerHTML = `
+    <img src="${imageUrl}"
+         class="object-cover w-full h-full cursor-pointer hover:scale-110 transition-transform duration-200"
+         alt="Attachment">
+  `;
+
+  const uploadLabel = container.querySelector('label[for="file-upload"]');
+  if (uploadLabel) container.insertBefore(div, uploadLabel);
+  else container.appendChild(div);
 }
