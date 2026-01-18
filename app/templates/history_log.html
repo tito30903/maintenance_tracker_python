@@ -1,0 +1,44 @@
+{% extends 'dashboard_layout.html' %}
+
+{% block content %}
+<div class="p-4">
+  <div class="flex items-center gap-2 mb-4">
+    <h2 class="text-xl font-bold">History Log</h2>
+
+    <div class="ml-auto flex items-center gap-2">
+      <input id="history-search"
+             type="text"
+             placeholder="Search ticket name..."
+             class="px-3 py-2 border border-gray-300 rounded-lg text-sm w-64">
+      <button onclick="loadHistory()"
+              class="px-3 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 text-sm">
+        Search
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile cards -->
+  <div id="history-cards" class="space-y-3"></div>
+  <div id="history-table-wrap" class="overflow-x-auto border border-gray-200 rounded-lg">
+    <table class="min-w-[12000px] w-full text-sm table-fixed">
+      <thead class="bg-gray-50">
+          <tr class="text-left">
+            <th class="p-3 w-[260px]">Ticket Name</th>
+            <th class="p-3 w-[180px]">Created</th>
+            <th class="p-3 w-[180px]">Updated</th>
+            <th class="p-3 w-[160px]">Assignee</th>
+            <th class="p-3 w-[360px]">Update</th>
+            <th class="p-3 w-[140px]">Status</th>
+            <th class="p-3 w-[120px]">Priority</th>
+            <th class="p-3 w-[220px]">Photos</th>
+        </tr>
+      </thead>
+      <tbody id="history-body" class="divide-y divide-gray-200 bg-white leading-relaxed">
+        <tr><td class="p-3 text-gray-500" colspan="8">Loading...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script src="/static/js/history_log.js"></script>
+{% endblock %}

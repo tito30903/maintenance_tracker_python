@@ -140,7 +140,7 @@ def update_user(token: str, email: str, name: str, password: str) -> bool:
 def _get_users() -> list[dict]:
     return supabase.table('users').select('*').execute().data
 
-# --- NEW: helpers ---
+# ---  helpers ---
 def get_ticket_by_id(ticket_id: str) -> dict | None:
     resp = supabase.table("tickets").select("*").eq("id", ticket_id).execute()
     if resp.data and len(resp.data) == 1:

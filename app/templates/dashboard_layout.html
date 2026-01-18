@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flask App</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
     <style>
@@ -13,7 +12,7 @@
         right: 0;
         bottom: 0;
 
-        width: 100% !important;     /* überschreibt w-0/w-80 */
+        width: 100% !important; 
         max-height: 85vh;
         overflow-y: auto !important;
         overflow-x: hidden;
@@ -31,7 +30,15 @@
         #ticket-sidebar.mobile-open {
         transform: translateY(0);
         }
-  }
+
+        #history-cards { display: none; }
+        #history-table-wrap { display: block; }
+
+        @media (max-width: 767px) {
+        #history-cards { display: block; }
+        #history-table-wrap { display: none; }
+        }
+    }
 </style>
 </head>
 <body class="min-h-screen flex flex-col">

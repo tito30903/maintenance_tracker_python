@@ -572,7 +572,7 @@ function showSidebar() {
     if (backdrop) backdrop.classList.remove('hidden');
     document.body.classList.add('overflow-hidden');
   } else {
-    // Desktop: exakt wie vorher (seitlich)
+    // Desktop
     sidebar.classList.remove('w-0');
     sidebar.classList.add('w-80', 'p-4');
 
@@ -593,16 +593,13 @@ function closeSidebar() {
     if (backdrop) backdrop.classList.add('hidden');
     document.body.classList.remove('overflow-hidden');
 
-    // optional: padding weg, wenn geschlossen
     sidebar.classList.remove('p-4');
   } else {
-    // Desktop close: exakt wie vorher
     sidebar.classList.remove('w-80', 'p-4');
     sidebar.classList.add('w-0');
   }
 }
 
-// optional: if user rotates phone / resizes window while open
 window.addEventListener('resize', () => {
   if (currentSidebarTicketId) showSidebar();
 });
@@ -807,10 +804,10 @@ async function autoSaveSidebar({ status, priority, assigned_to } = {}, files = [
   if (status !== undefined) formData.append("status", String(status));
   if (priority !== undefined) formData.append("priority", String(priority));
 
-  // IMPORTANT: to unassign we must send "" (backend turns "" into None)
+  // to unassign we must send "" (backend turns "" into None)
   if (assigned_to !== undefined) formData.append("assigned_to", assigned_to ?? "");
 
-  // note text shown in history (optional)
+  // note text shown in history 
   formData.append("message", note ?? "");
 
   for (const f of files) {
