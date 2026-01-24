@@ -233,7 +233,7 @@ def save_ticket_update(user_id: str):
 
 @main.route(API_TICKETS + '/history', methods=['GET'])
 @authorized
-def get_history(role: UserRoles, user_id: str):
+def get_history():
     q = request.args.get("q")
     rows = db.get_ticket_history(search=q)
     return jsonify({"success": True, "entries": rows})
