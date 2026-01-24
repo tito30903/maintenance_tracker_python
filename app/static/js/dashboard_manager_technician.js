@@ -1,4 +1,4 @@
-// State
+// state
 let techniciansCache = [];
 let ticketsCache = [];
 let currentSidebarTicketId = null;
@@ -13,7 +13,7 @@ let filters = {
 
 let picturesLoadToken = 0;
 
-// Constants
+// constants
 const STATUSES = [
     { text: 'All Status', color: 'bg-gray-100 text-gray-800', dotColor: 'bg-gray-400' },
     { text: 'Open', color: 'bg-yellow-100 text-yellow-800', dotColor: 'bg-yellow-400' },
@@ -29,7 +29,7 @@ const PRIORITIES = [
 ];
 
 
-// Initialize
+// inits
 document.addEventListener('DOMContentLoaded', init);
 document.addEventListener('ticketCreated', loadTickets);
 
@@ -200,7 +200,6 @@ function toggleMenu(menu) {
 function closeAllMenus() {
     document.querySelectorAll('.status-menu, .priority-menu, .assignee-menu, #sidebar-status-menu, #sidebar-priority-menu, #sidebar-assignee-menu, #filter-technician-menu, #filter-status-menu, #filter-priority-menu').forEach(menu => {
         menu.classList.add('hidden');
-        console.log("this is still triggered");
     });
 }
 
@@ -250,7 +249,7 @@ function clearFilters() {
 }
 
 function updateFilterUI() {
-    // Update technician filter label
+    // update technician filter label
     const techLabel = document.getElementById('filter-technician-label');
     if (filters.technician === '') {
         techLabel.textContent = 'All Technicians';
@@ -260,7 +259,7 @@ function updateFilterUI() {
         techLabel.textContent = getTechnicianName(filters.technician);
     }
     
-    // Update status filter
+    // update status filter
     const statusDot = document.getElementById('filter-status-dot');
     const statusLabel = document.getElementById('filter-status-label');
     if (filters.status === '') {
@@ -272,7 +271,7 @@ function updateFilterUI() {
         statusLabel.textContent = getStatusText(statusNum);
     }
     
-    // Update priority filter
+    // update priority filter
     const priorityIcon = document.getElementById('filter-priority-icon');
     const priorityLabel = document.getElementById('filter-priority-label');
     priorityIcon.innerHTML = ''; // Clear existing content
@@ -285,7 +284,7 @@ function updateFilterUI() {
         priorityLabel.textContent = getPriorityText(priorityNum);
     }
     
-    // Show/hide clear button
+    // show / hide clear button
     const hasFilters = filters.technician || filters.status || filters.priority;
     document.getElementById('clear-filters-btn').classList.toggle('hidden', !hasFilters);
 }
@@ -336,15 +335,14 @@ function toggleTicketStatusMenu(e) {
 }
 
 function setupShowTicketSidebarEventListener() {
-    document.getElementById('tickets-container').addEventListener('click', (e) => {
+    document.getElementById('tickets-container').addEventListener('click', async(e) => {
         const card = e.target.closest('.ticket-card');
         if (!card) return;
         
         const ticketId = card.dataset.ticketId;
-        ticketPictures = [];
         clearPictures();
-        // Click on the card itself - show sidebar
-        showTicketSidebar(ticketId);
+        // click on card to show sidebar
+        await showTicketSidebar(ticketId);
     });
 }
 
@@ -364,27 +362,27 @@ function renderTickets(tickets) {
         const card = clone.querySelector('.ticket-card');
         card.dataset.ticketId = ticket.id;
 
-        // Name
+        // name
         clone.querySelector('.ticket-name').textContent = ticket.name;
         
-        // Assignee
+        // assignee
         clone.querySelector('.assignee-name').textContent = getTechnicianName(ticket.assigned_to);
         
-        // Populate assignee dropdown
+        // populate assignee dropdown
         const assigneeMenu = clone.querySelector('.assignee-menu');
         addAssigneeButtonsToMenu(assigneeMenu, (assigneeId) => updateTicket({id: ticket.id, assigned_to: assigneeId}), false);
         
-        // Status
+        // status
         const statusEl = clone.querySelector('.ticket-status');
 
         statusEl.textContent = getStatusText(ticket.status);
         statusEl.className += ' ' + getStatusColor(ticket.status);
 
-        // Populate status dropdown
+        // populate status dropdown
         const statusMenu = clone.querySelector('.status-menu');
         addStatusButtonsToMenu(statusMenu, (status) => updateTicket({id: ticket.id, status: status}), false);
         
-        // Priority
+        // priority
         clone.querySelector('.ticket-priority').appendChild(getPriorityIcon(ticket.priority));
         addPriorityButtonsToMenu(
             clone.querySelector('.priority-menu'),
@@ -444,14 +442,14 @@ function setupSidebarEvents() {
     });
   }
 
-  // Save button exists on both pages after you added it
+  // save button exists on both pages
   const saveBtn = document.getElementById('sidebar-save-btn');
   if (saveBtn) {
     updateSaveButtonState();
   }
 }
 
-function showTicketSidebar(ticketId) {
+async function showTicketSidebar(ticketId) {
   const ticket = ticketsCache.find(t => t.id === ticketId);
   if (!ticket) return;
 
@@ -480,17 +478,17 @@ function showTicketSidebar(ticketId) {
   // reset staged files
   sidebarStagedFiles.forEach(x => URL.revokeObjectURL(x.url));
   sidebarStagedFiles = [];
-  clearPictures(); // clears thumbnails (except upload label)
-  loadPictures(ticketId); // reload existing pictures from server (your old endpoint)
+  clearPictures(); // clears thumbnails
+  await loadPictures(ticketId); // reload existing pictures from server
 
-  // Name & Description
+  // name + description
   document.getElementById('sidebar-name').value = sidebarDraft.values.name;
   document.getElementById('sidebar-description').value = sidebarDraft.values.description;
 
-  // Assignee label
+  // assignee
   document.getElementById('sidebar-assignee-name').textContent = getTechnicianName(sidebarDraft.values.assigned_to);
 
-  // Populate assignee dropdown (changes draft only)
+  // populate assignee dropdown
   const assigneeMenu = document.getElementById('sidebar-assignee-menu');
   assigneeMenu.innerHTML = '';
   addAssigneeButtonsToMenu(assigneeMenu, async (assigneeId) => {
@@ -502,12 +500,12 @@ function showTicketSidebar(ticketId) {
     }, false);
 
 
-  // Status UI
+  // status
   const statusEl = document.getElementById('sidebar-status');
   statusEl.textContent = getStatusText(sidebarDraft.values.status);
   statusEl.className = 'text-xs px-2 py-1 rounded-full cursor-pointer hover:opacity-70 ' + getStatusColor(sidebarDraft.values.status);
 
-  // Populate status dropdown (draft only)
+  // populate status dropdown
   const statusMenu = document.getElementById('sidebar-status-menu');
   statusMenu.innerHTML = '';
   addStatusButtonsToMenu(statusMenu, async (status) => {
@@ -520,7 +518,7 @@ function showTicketSidebar(ticketId) {
     }, false);
 
 
-  // Priority UI
+  // priority UI
   const sidebarPriority = document.getElementById('sidebar-priority');
   sidebarPriority.innerHTML = "";
   sidebarPriority.appendChild(getPriorityIcon(sidebarDraft.values.priority));
@@ -528,7 +526,7 @@ function showTicketSidebar(ticketId) {
   span.textContent = getPriorityText(sidebarDraft.values.priority);
   sidebarPriority.appendChild(span);
 
-  // Priority dropdown (draft only)
+  // priority dropdown
   const priorityMenu = document.getElementById('sidebar-priority-menu');
   priorityMenu.innerHTML = '';
   addPriorityButtonsToMenu(priorityMenu, async (priority) => {
@@ -544,12 +542,12 @@ function showTicketSidebar(ticketId) {
     }, false);
 
 
-  // Created date
+  // created at date
   document.getElementById('sidebar-created').textContent = ticket.created_at
     ? new Date(ticket.created_at).toLocaleString()
     : 'Unknown';
 
-  // Update textbox (exists after you added it)
+  // update textbox
   const msgEl = document.getElementById('sidebar-update-message');
   if (msgEl) msgEl.value = "";
 
@@ -567,12 +565,12 @@ function showSidebar() {
   const backdrop = document.getElementById('sidebar-backdrop');
 
   if (isMobile()) {
-    // Mobile: Bottom-sheet
+    // for mobile show bottom sheet
     sidebar.classList.add('mobile-open', 'p-4');
     if (backdrop) backdrop.classList.remove('hidden');
     document.body.classList.add('overflow-hidden');
   } else {
-    // Desktop
+    // show desktop sidebar
     sidebar.classList.remove('w-0');
     sidebar.classList.add('w-80', 'p-4');
 
@@ -588,13 +586,14 @@ function closeSidebar() {
   const backdrop = document.getElementById('sidebar-backdrop');
 
   if (isMobile()) {
-    // Mobile close
+    // close sheet on mobile
     sidebar.classList.remove('mobile-open');
     if (backdrop) backdrop.classList.add('hidden');
     document.body.classList.remove('overflow-hidden');
 
     sidebar.classList.remove('p-4');
   } else {
+      // close sidebar on desktop
     sidebar.classList.remove('w-80', 'p-4');
     sidebar.classList.add('w-0');
   }
@@ -678,42 +677,16 @@ function addStatusButtonsToMenu(menu, onclickAction, isFilter) {
             onclickAction(idx);
         };
 
-        // Dot
+        // dot
         const dot = document.createElement('span');
         dot.className = `inline-block w-2 h-2 rounded-full mr-2 ${status.dotColor}`;
         statusBtn.appendChild(dot);
 
-        // Label
+        // label
         const textNode = document.createTextNode(status.text);
         statusBtn.appendChild(textNode);
 
         menu.appendChild(statusBtn);
-    }
-}
-
-function addThumbnailToSidebar(imageUrl) {
-    const container = document.getElementById('sidebar-attachments');
-    const div = document.createElement('div');
-    div.className = "relative group aspect-square bg-gray-100 rounded overflow-hidden border border-gray-200";
-
-    div.innerHTML = `
-        <img src="${imageUrl}"
-             class="object-cover w-full h-full cursor-pointer hover:scale-110 transition-transform duration-200"
-             onclick="window.open('${imageUrl}', '_blank')"
-             alt="Ticket Anhang">
-
-        <button onclick="deleteAttachment(this, '${imageUrl}')"
-                class="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-700">
-            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-        </button>
-    `;
-    const uploadButton = container.querySelector('label[for="file-upload"]');
-    if (uploadButton) {
-        container.insertBefore(div, uploadButton);
-    } else {
-        container.appendChild(div);
     }
 }
 
@@ -724,45 +697,6 @@ function clearPictures() {
   const uploadLabel = container.querySelector('label[for="file-upload"]');
   container.innerHTML = "";
   if (uploadLabel) container.appendChild(uploadLabel);
-}
-
-
-function addStagedThumbnailToSidebar(stagedId, imageUrl) {
-  const container = document.getElementById('sidebar-attachments');
-  const div = document.createElement('div');
-  div.className = "relative group aspect-square bg-gray-100 rounded overflow-hidden border border-gray-200";
-  div.dataset.stagedId = stagedId;
-
-  div.innerHTML = `
-    <img src="${imageUrl}"
-         class="object-cover w-full h-full cursor-pointer hover:scale-110 transition-transform duration-200"
-         alt="Staged Attachment">
-
-    <button onclick="removeStagedAttachment('${stagedId}')"
-            class="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-700">
-      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-      </svg>
-    </button>
-  `;
-
-  const uploadButton = container.querySelector('label[for="file-upload"]');
-  if (uploadButton) container.insertBefore(div, uploadButton);
-  else container.appendChild(div);
-}
-
-function removeStagedAttachment(stagedId) {
-  const idx = sidebarStagedFiles.findIndex(x => x.id === stagedId);
-  if (idx >= 0) {
-    URL.revokeObjectURL(sidebarStagedFiles[idx].url);
-    sidebarStagedFiles.splice(idx, 1);
-  }
-
-  const container = document.getElementById('sidebar-attachments');
-  const el = container.querySelector(`[data-staged-id="${stagedId}"]`);
-  if (el) el.remove();
-
-  updateSaveButtonState();
 }
 
 function hasDraftChanges() {
@@ -832,7 +766,7 @@ async function autoSaveSidebar({ status, priority, assigned_to } = {}, files = [
 
     // refresh list + sidebar so draft/original stays in sync + photos reload
     await loadTickets();
-    showTicketSidebar(ticketId);
+    await showTicketSidebar(ticketId);
   } catch (e) {
     console.error(e);
   } finally {
@@ -886,7 +820,7 @@ async function saveSidebarChanges() {
     sidebarStagedFiles = [];
 
     await loadTickets();          
-    showTicketSidebar(ticketId); 
+    await showTicketSidebar(ticketId);
   } catch (e) {
     console.error(e);
   }
